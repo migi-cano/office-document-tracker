@@ -1,14 +1,13 @@
-import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { StatusBar } from "expo-status-bar";
 
-import { AppNavigator } from "./src/navigation";
 import { AppProvider } from "./src/providers";
+import { RootNavigator } from "./src/navigation";
 
 export default function App() {
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <AppProvider>
-        <AppNavigator />
-      </AppProvider>
-    </GestureHandlerRootView>
+    <AppProvider>
+      <StatusBar style="auto" />
+      <RootNavigator />
+    </AppProvider>
   );
 }
