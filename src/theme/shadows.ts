@@ -1,16 +1,23 @@
-import { Platform } from "react-native";
-
 export const Shadows = {
-  card: Platform.select({
-    ios: {
-      shadowColor: "#000",
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.08,
-      shadowRadius: 4,
+  sm: {
+    shadowColor: "#000",
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+    shadowOffset: {
+      width: 0,
+      height: 2,
     },
-    android: {
-      elevation: 3,
+    elevation: 2,
+  },
+
+  md: {
+    shadowColor: "#000",
+    shadowOpacity: 0.12,
+    shadowRadius: 8,
+    shadowOffset: {
+      width: 0,
+      height: 4,
     },
-    default: {},
-  }),
+    elevation: 4,
+  },
 };

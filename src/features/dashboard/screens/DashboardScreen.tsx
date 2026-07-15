@@ -1,36 +1,76 @@
-import { View } from "react-native";
+import AppButton from "../../../components/common/AppButton";
+import AppCard from "../../../components/common/AppCard";
+import AppText from "../../../components/common/AppText";
 
-import { AppButton, AppText } from "../../../components/common";
+import {
+  AppHeader,
+  SafeScreen,
+  ScreenContainer,
+} from "../../../components/layout";
 
-export default function HomeScreen() {
+import { useAuth } from "../../../providers/AuthProvider";
+import { useDashboard } from "../hooks/useDashboard";
+
+export default function DashboardScreen() {
+  const { user, logout } = useAuth();
+
+  const {
+    loading,
+    stats,
+    activities,
+  } = useDashboard();
+
+  if (loading || !stats) {
+    return (
+      <SafeScreen>
+        <ScreenContainer>
+          <AppText>Loading...</AppText>
+        </ScreenContainer>
+      </SafeScreen>
+    );
+  }
+
   return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-        gap: 16,
-        padding: 16,
-      }}
-    >
-      <AppText variant="title">
-        Office Document Tracker
-      </AppText>
+    <SafeScreen>
+      <ScreenContainer>
+        <AppHeader
+          title="Office Document Tracker"
+          subtitle={`Welcome, ${user?.name}`}
+        />
 
-      <AppButton
-        title="Primary Button"
-        onPress={() => console.log("Pressed")}
-      />
+        <AppCard>
+          <AppText>
+            Received Documents: {stats.received}
+          </AppText>
 
-      <AppButton
-        title="Secondary Button"
-        variant="secondary"
-      />
+          <AppText>
+            Released Documents: {stats.released}
+          </AppText>
 
-      <AppButton
-        title="Outline Button"
-        variant="outline"
-      />
-    </View>
+          <AppText>
+            Pending Documents: {stats.pending}
+          </AppText>
+
+          <AppText>
+            Active Users: {stats.users}
+          </AppText>
+        </AppCard>
+
+        <AppCard>
+          <AppText>Recent Activity</AppText>
+
+          {activities.map((item) => (
+            <AppText key={item.id}>
+              • {item.message}
+            </AppText>
+          ))}
+        </AppCard>
+
+        <AppButton
+          title="Logout"
+          onPress={logout}
+        />
+      </ScreenContainer>
+    </SafeScreen>
   );
 }
