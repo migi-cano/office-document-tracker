@@ -22,19 +22,20 @@ export default function AppButton({
       {...props}
       disabled={disabled || loading}
       style={[
-        styles.button,
-        styles[variant],
-        style,
-      ]}
+  styles.button,
+  styles[variant],
+  (disabled || loading) && styles.disabled,
+  style,
+]}
     >
       {loading ? (
-        <ActivityIndicator color="#fff" />
+        <ActivityIndicator color={Colors.white} />
       ) : (
         <AppText
           color={
             variant === "outline"
               ? Colors.primary
-              : "#fff"
+              : Colors.white
           }
         >
           {title}

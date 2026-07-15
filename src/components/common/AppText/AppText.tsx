@@ -5,7 +5,7 @@ import { Colors, Typography } from "../../../theme";
 import { styles } from "./AppText.styles";
 import { AppTextProps } from "./AppText.types";
 
-const fontSizes = {
+const typographyVariants = {
   title: Typography.title,
   heading: Typography.heading,
   body: Typography.body,
@@ -25,8 +25,8 @@ export default function AppText({
       {...props}
       style={[
         styles.text,
+        typographyVariants[variant], // ✅ Apply the whole typography object
         {
-          fontSize: fontSizes[variant],
           color,
           textAlign: center ? "center" : "left",
         },

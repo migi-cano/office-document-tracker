@@ -24,4 +24,8 @@ export const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: Colors.primary,
   },
+
+  disabled: {
+  opacity: 0.6,
+},
 });
