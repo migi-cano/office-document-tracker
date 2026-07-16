@@ -10,17 +10,21 @@ import {
 
 import { useAuth } from "../../../providers/AuthProvider";
 import { useDashboard } from "../hooks/useDashboard";
-
+import { DashboardStatCard } from "../../../components/business";
 export default function DashboardScreen() {
   const { user, logout } = useAuth();
 
   const {
     loading,
-    stats,
-    activities,
+    totalDocuments,
+    receivedDocuments,
+    pendingDocuments,
+    releasedDocuments,
+    highPriorityDocuments,
+    recentDocuments,
   } = useDashboard();
 
-  if (loading || !stats) {
+  if (loading) {
     return (
       <SafeScreen>
         <ScreenContainer>
@@ -39,29 +43,59 @@ export default function DashboardScreen() {
         />
 
         <AppCard>
+          <DashboardStatCard
+              title="Total Documents"
+              value={totalDocuments}
+              icon="document-text"
+          />
+
+          <DashboardStatCard
+              title="Received"
+              value={receivedDocuments}
+              icon="mail"
+          />
+
+          <DashboardStatCard
+              title="Pending"
+              value={pendingDocuments}
+              icon="time"
+          />
+
+          <DashboardStatCard
+              title="Released"
+              value={releasedDocuments}
+              icon="checkmark-circle"
+          />
+
+          <DashboardStatCard
+              title="High Priority"
+              value={highPriorityDocuments}
+              icon="alert-circle"
+          />
+
           <AppText>
-            Received Documents: {stats.received}
+            Received Documents: {receivedDocuments}
           </AppText>
 
           <AppText>
-            Released Documents: {stats.released}
+            Pending Documents: {pendingDocuments}
           </AppText>
 
           <AppText>
-            Pending Documents: {stats.pending}
+            Released Documents: {releasedDocuments}
           </AppText>
 
           <AppText>
-            Active Users: {stats.users}
+            High Priority: {highPriorityDocuments}
           </AppText>
         </AppCard>
 
         <AppCard>
-          <AppText>Recent Activity</AppText>
+          <AppText>Recent Documents</AppText>
 
-          {activities.map((item) => (
-            <AppText key={item.id}>
-              • {item.message}
+          {recentDocuments.map((document) => (
+            <AppText key={document.id}>
+              • {document.subject}
             </AppText>
           ))}
         </AppCard>

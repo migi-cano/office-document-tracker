@@ -12,6 +12,7 @@ import {
   AppHeader,
   SafeScreen,
   ScreenContainer,
+  ScrollableScreen,
 } from "../../../components/layout";
 
 import DocumentForm from "../components/DocumentForm";
@@ -85,6 +86,7 @@ export default function EditDocumentScreen() {
 
   return (
     <SafeScreen>
+        <ScrollableScreen>  
       <ScreenContainer>
         <AppHeader
           title="Edit Document"
@@ -102,6 +104,7 @@ export default function EditDocumentScreen() {
           onSubmit={handleUpdate}
         />
       </ScreenContainer>
+        </ScrollableScreen>
     </SafeScreen>
   );
 }

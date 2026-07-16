@@ -4,6 +4,7 @@ import {
   AppHeader,
   SafeScreen,
   ScreenContainer,
+  ScrollableScreen,
 } from "../../../components/layout";
 
 import DocumentForm from "../components/DocumentForm";
@@ -13,13 +14,18 @@ import { generateTrackingNumber } from "../utils/generateTrackingNumber";
 
 import { ReceiveDocumentFormData } from "../validation/receiveDocument.schema";
 
+
+
 export default function ReceiveDocumentScreen() {
   const navigation = useNavigation();
 
   async function handleCreate(
-    data: ReceiveDocumentFormData
-  ) {
-    const now = new Date();
+  data: ReceiveDocumentFormData
+) {
+  console.log("handleCreate called");
+  console.log(data);
+
+  const now = new Date();
 
     await documentService.addDocument({
       id: Date.now().toString(),
@@ -42,11 +48,14 @@ export default function ReceiveDocumentScreen() {
       updatedAt: now.toISOString(),
     });
 
-    navigation.goBack();
-  }
+    console.log("Document saved");
+
+  navigation.goBack();
+}
 
   return (
     <SafeScreen>
+      <ScrollableScreen>
       <ScreenContainer>
         <AppHeader
           title="Receive Document"
@@ -58,6 +67,7 @@ export default function ReceiveDocumentScreen() {
           onSubmit={handleCreate}
         />
       </ScreenContainer>
+      </ScrollableScreen>
     </SafeScreen>
   );
 }

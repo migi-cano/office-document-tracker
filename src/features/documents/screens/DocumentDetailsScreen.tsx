@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import {RouteProp,useRoute,useFocusEffect,} from "@react-navigation/native";
 import { useCallback } from "react";
-import {AppHeader,SafeScreen,ScreenContainer,} from "../../../components/layout";
+import {AppHeader,SafeScreen,ScreenContainer,ScrollableScreen} from "../../../components/layout";
 import {AppText,} from "../../../components/common";
 import { documentService } from "../services/document.service";
 import { Document } from "../types/document.types";
@@ -76,6 +76,7 @@ export default function DocumentDetailsScreen() {
 
     return (
         <SafeScreen>
+          <ScrollableScreen>
             <ScreenContainer>
 
                 <AppHeader
@@ -163,6 +164,7 @@ export default function DocumentDetailsScreen() {
         />
 
             </ScreenContainer>
+          </ScrollableScreen>
         </SafeScreen>
     );
 }

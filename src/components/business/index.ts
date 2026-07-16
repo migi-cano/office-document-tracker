@@ -4,3 +4,5 @@ export { default as StatusBadge } from "./StatusBadge";
 export { default as DocumentCard } from "./DocumentCard";
 export { default as SearchBar } from "./SearchBar";
 export { default as DetailRow } from "./DetailRow";
+export { default as DashboardStatCard } from "./DashboardStatCard";
+export { default as StatusSelector } from "./StatusSelector";

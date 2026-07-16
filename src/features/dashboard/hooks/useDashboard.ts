@@ -1,46 +1,50 @@
-import { useEffect, useState } from "react";
+import { useMemo } from "react";
 
-import { dashboardService } from "../services/dashboard.service";
-
-import {
-  ActivityItem,
-  DashboardStats,
-} from "../types/dashboard.types";
+import { useDocuments } from "../../documents/hooks/useDocuments";
 
 export function useDashboard() {
-  const [loading, setLoading] = useState(true);
+  const { documents, loading, refresh } = useDocuments();
 
-  const [stats, setStats] =
-    useState<DashboardStats | null>(null);
+  const stats = useMemo(() => {
+    const totalDocuments = documents.length;
 
-  const [activities, setActivities] =
-    useState<ActivityItem[]>([]);
+    const receivedDocuments = documents.filter(
+      (document) => document.status === "Received"
+    ).length;
 
-  useEffect(() => {
-    loadDashboard();
-  }, []);
+    const pendingDocuments = documents.filter(
+      (document) => document.status === "Pending"
+    ).length;
 
-  async function loadDashboard() {
-    try {
-      setLoading(true);
+    const releasedDocuments = documents.filter(
+      (document) => document.status === "Released"
+    ).length;
 
-      const statsData =
-        await dashboardService.getStats();
+    const highPriorityDocuments = documents.filter(
+      (document) => document.priority === "High"
+    ).length;
 
-      const activitiesData =
-        await dashboardService.getActivities();
+    const recentDocuments = [...documents]
+      .sort(
+        (a, b) =>
+          new Date(b.createdAt).getTime() -
+          new Date(a.createdAt).getTime()
+      )
+      .slice(0, 5);
 
-      setStats(statsData);
-      setActivities(activitiesData);
-    } finally {
-      setLoading(false);
-    }
-  }
+    return {
+      totalDocuments,
+      receivedDocuments,
+      pendingDocuments,
+      releasedDocuments,
+      highPriorityDocuments,
+      recentDocuments,
+    };
+  }, [documents]);
 
   return {
+    ...stats,
     loading,
-    stats,
-    activities,
-    refresh: loadDashboard,
+    refresh,
   };
 }
