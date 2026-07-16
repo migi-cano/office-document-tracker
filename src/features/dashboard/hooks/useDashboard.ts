@@ -1,46 +1,60 @@
-import { useEffect, useState } from "react";
+import { useCallback, useState } from "react";
+import { useFocusEffect } from "@react-navigation/native";
 
 import { dashboardService } from "../services/dashboard.service";
 
-import {
-  ActivityItem,
-  DashboardStats,
-} from "../types/dashboard.types";
+import { Document } from "../../documents/types/document.types";
 
 export function useDashboard() {
   const [loading, setLoading] = useState(true);
 
-  const [stats, setStats] =
-    useState<DashboardStats | null>(null);
+  const [totalDocuments, setTotalDocuments] = useState(0);
+  const [receivedDocuments, setReceivedDocuments] = useState(0);
+  const [pendingDocuments, setPendingDocuments] = useState(0);
+  const [releasedDocuments, setReleasedDocuments] = useState(0);
+  const [highPriorityDocuments, setHighPriorityDocuments] = useState(0);
 
-  const [activities, setActivities] =
-    useState<ActivityItem[]>([]);
-
-  useEffect(() => {
-    loadDashboard();
-  }, []);
+  const [recentDocuments, setRecentDocuments] = useState<Document[]>([]);
 
   async function loadDashboard() {
     try {
       setLoading(true);
 
-      const statsData =
-        await dashboardService.getStats();
+      const statistics =
+        await dashboardService.getStatistics();
 
-      const activitiesData =
-        await dashboardService.getActivities();
+      const recent =
+        await dashboardService.getRecentDocuments();
 
-      setStats(statsData);
-      setActivities(activitiesData);
+      setTotalDocuments(statistics.totalDocuments);
+      setReceivedDocuments(statistics.receivedDocuments);
+      setPendingDocuments(statistics.pendingDocuments);
+      setReleasedDocuments(statistics.releasedDocuments);
+      setHighPriorityDocuments(statistics.highPriorityDocuments);
+
+      setRecentDocuments(recent);
     } finally {
       setLoading(false);
     }
   }
 
+  useFocusEffect(
+    useCallback(() => {
+      loadDashboard();
+    }, [])
+  );
+
   return {
     loading,
-    stats,
-    activities,
+
+    totalDocuments,
+    receivedDocuments,
+    pendingDocuments,
+    releasedDocuments,
+    highPriorityDocuments,
+
+    recentDocuments,
+
     refresh: loadDashboard,
   };
 }

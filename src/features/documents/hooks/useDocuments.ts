@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useCallback, useState } from "react";
+import { useFocusEffect } from "@react-navigation/native";
 
 import { documentService } from "../services/document.service";
 import { Document } from "../types/document.types";
@@ -7,9 +8,11 @@ export function useDocuments() {
   const [documents, setDocuments] = useState<Document[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    loadDocuments();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      loadDocuments();
+    }, [])
+  );
 
   async function loadDocuments() {
     try {

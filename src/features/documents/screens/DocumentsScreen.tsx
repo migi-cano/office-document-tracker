@@ -81,7 +81,17 @@ const navigation =
             data={filteredDocuments}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
-                <DocumentCard document={item} />
+                <DocumentCard
+                      document={item}
+                      onPress={() =>
+                          navigation.navigate(
+                              "DocumentDetails",
+                              {
+                                  documentId: item.id,
+                              }
+                          )
+                      }
+                  />
             )}
             refreshing={loading}
             onRefresh={refresh}

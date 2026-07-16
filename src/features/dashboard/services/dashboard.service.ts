@@ -1,35 +1,58 @@
-import {
-  ActivityItem,
-  DashboardStats,
-} from "../types/dashboard.types";
+import { supabase } from "../../../lib/supabase";
 
-export const dashboardService = {
-  async getStats(): Promise<DashboardStats> {
+class DashboardService {
+  async getStatistics() {
+    const { data, error } = await supabase
+      .from("documents")
+      .select("status, priority");
+
+    if (error) {
+      throw error;
+    }
+
+    const totalDocuments = data.length;
+
+    const receivedDocuments = data.filter(
+      d => d.status === "Received"
+    ).length;
+
+    const pendingDocuments = data.filter(
+      d => d.status === "Pending"
+    ).length;
+
+    const releasedDocuments = data.filter(
+      d => d.status === "Released"
+    ).length;
+
+    const highPriorityDocuments = data.filter(
+      d => d.priority === "High"
+    ).length;
+
     return {
-      received: 25,
-      released: 18,
-      pending: 7,
-      users: 12,
+      totalDocuments,
+      receivedDocuments,
+      pendingDocuments,
+      releasedDocuments,
+      highPriorityDocuments,
     };
-  },
+  }
 
-  async getActivities(): Promise<ActivityItem[]> {
-    return [
-      {
-        id: "1",
-        message: "Memo 2026-001 Received",
-        date: "Today",
-      },
-      {
-        id: "2",
-        message: "Payroll Released",
-        date: "Today",
-      },
-      {
-        id: "3",
-        message: "Leave Form Approved",
-        date: "Today",
-      },
-    ];
-  },
-};
+  async getRecentDocuments() {
+    const { data, error } = await supabase
+      .from("documents")
+      .select("*")
+      .order("created_at", {
+        ascending: false,
+      })
+      .limit(5);
+
+    if (error) {
+      throw error;
+    }
+
+    return data;
+  }
+}
+
+export const dashboardService =
+  new DashboardService();
