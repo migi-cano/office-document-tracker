@@ -27,26 +27,26 @@ export default function ReceiveDocumentScreen() {
 
   const now = new Date();
 
-    await documentService.addDocument({
-      id: Date.now().toString(),
+await documentService.addDocument({
+  id: Date.now().toString(),
 
-      trackingNumber: generateTrackingNumber(),
+  trackingNumber: generateTrackingNumber(),
 
-      subject: data.subject,
-      sender: data.sender,
-      receiver: data.receiver,
-      department: data.department,
+  subject: data.subject,
+  sender: data.sender,
+  receiver: data.receiver,
+  department: data.department,
 
-      priority: "Normal",
-      status: "Received",
+  priority: "Normal",
+  status: "Received",
 
-      remarks: data.remarks ?? "",
+  remarks: data.remarks ?? "",
 
-      dateReceived: now.toISOString().split("T")[0],
+  dateReceived: now.toISOString(),
 
-      createdAt: now.toISOString(),
-      updatedAt: now.toISOString(),
-    });
+  createdAt: now.toISOString(),
+  updatedAt: now.toISOString(),
+});
 
     console.log("Document saved");
 

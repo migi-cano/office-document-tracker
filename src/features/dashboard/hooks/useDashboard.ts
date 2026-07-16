@@ -1,50 +1,60 @@
-import { useMemo } from "react";
+import { useCallback, useState } from "react";
+import { useFocusEffect } from "@react-navigation/native";
 
-import { useDocuments } from "../../documents/hooks/useDocuments";
+import { dashboardService } from "../services/dashboard.service";
+
+import { Document } from "../../documents/types/document.types";
 
 export function useDashboard() {
-  const { documents, loading, refresh } = useDocuments();
+  const [loading, setLoading] = useState(true);
 
-  const stats = useMemo(() => {
-    const totalDocuments = documents.length;
+  const [totalDocuments, setTotalDocuments] = useState(0);
+  const [receivedDocuments, setReceivedDocuments] = useState(0);
+  const [pendingDocuments, setPendingDocuments] = useState(0);
+  const [releasedDocuments, setReleasedDocuments] = useState(0);
+  const [highPriorityDocuments, setHighPriorityDocuments] = useState(0);
 
-    const receivedDocuments = documents.filter(
-      (document) => document.status === "Received"
-    ).length;
+  const [recentDocuments, setRecentDocuments] = useState<Document[]>([]);
 
-    const pendingDocuments = documents.filter(
-      (document) => document.status === "Pending"
-    ).length;
+  async function loadDashboard() {
+    try {
+      setLoading(true);
 
-    const releasedDocuments = documents.filter(
-      (document) => document.status === "Released"
-    ).length;
+      const statistics =
+        await dashboardService.getStatistics();
 
-    const highPriorityDocuments = documents.filter(
-      (document) => document.priority === "High"
-    ).length;
+      const recent =
+        await dashboardService.getRecentDocuments();
 
-    const recentDocuments = [...documents]
-      .sort(
-        (a, b) =>
-          new Date(b.createdAt).getTime() -
-          new Date(a.createdAt).getTime()
-      )
-      .slice(0, 5);
+      setTotalDocuments(statistics.totalDocuments);
+      setReceivedDocuments(statistics.receivedDocuments);
+      setPendingDocuments(statistics.pendingDocuments);
+      setReleasedDocuments(statistics.releasedDocuments);
+      setHighPriorityDocuments(statistics.highPriorityDocuments);
 
-    return {
-      totalDocuments,
-      receivedDocuments,
-      pendingDocuments,
-      releasedDocuments,
-      highPriorityDocuments,
-      recentDocuments,
-    };
-  }, [documents]);
+      setRecentDocuments(recent);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useFocusEffect(
+    useCallback(() => {
+      loadDashboard();
+    }, [])
+  );
 
   return {
-    ...stats,
     loading,
-    refresh,
+
+    totalDocuments,
+    receivedDocuments,
+    pendingDocuments,
+    releasedDocuments,
+    highPriorityDocuments,
+
+    recentDocuments,
+
+    refresh: loadDashboard,
   };
 }
