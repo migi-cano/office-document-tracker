@@ -36,6 +36,20 @@ async updateDocument(
   return mockDocuments[index];
 }
 
+async deleteDocument(id: string): Promise<boolean> {
+  const index = mockDocuments.findIndex(
+    (document) => document.id === id
+  );
+
+  if (index === -1) {
+    return false;
+  }
+
+  mockDocuments.splice(index, 1);
+
+  return true;
+}
+
 }
 
 export const documentService = new DocumentService();
