@@ -66,16 +66,21 @@ export default function EditDocumentScreen() {
   ) {
     if (!document) return;
 
-    await documentService.updateDocument(
-      document.id,
-      {
-        subject: data.subject,
-        sender: data.sender,
-        receiver: data.receiver,
-        department: data.department,
-        remarks: data.remarks,
-      }
-    );
+await documentService.updateDocument(document.id, {
+  title: data.title,
+
+  subject: data.subject,
+
+  destination: data.destination,
+
+  departmentFrom: data.departmentFrom,
+
+  processedBy: data.processedBy,
+
+  receivedBy: data.receivedBy,
+
+  remarks: data.remarks,
+});
 
     navigation.goBack();
   }
@@ -93,13 +98,16 @@ export default function EditDocumentScreen() {
         />
 
         <DocumentForm
+          documentType={document.documentType}
           initialValues={{
-            subject: document.subject,
-            sender: document.sender,
-            receiver: document.receiver,
-            department: document.department,
-            remarks: document.remarks,
-          }}
+          title: document.title,
+          subject: document.subject,
+          destination: document.destination,
+          departmentFrom: document.departmentFrom,
+          processedBy: document.processedBy,
+          receivedBy: document.receivedBy,
+          remarks: document.remarks,
+        }}
           submitButtonTitle="Update Document"
           onSubmit={handleUpdate}
         />

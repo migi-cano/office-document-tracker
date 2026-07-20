@@ -1,11 +1,11 @@
 import { View } from "react-native";
 
 import { AppText } from "../../common";
-
 import { Colors } from "../../../theme";
 
 import { styles } from "./StatusBadge.styles";
 import { StatusBadgeProps } from "./StatusBadge.types";
+import { DocumentStatus } from "../../../features/documents/types/document.types";
 
 export default function StatusBadge({
   status,
@@ -13,16 +13,20 @@ export default function StatusBadge({
   let backgroundColor = Colors.warning;
 
   switch (status) {
-    case "Received":
+    case DocumentStatus.RECEIVED:
       backgroundColor = Colors.info;
       break;
 
-    case "Released":
+    case DocumentStatus.PENDING:
+      backgroundColor = Colors.warning;
+      break;
+
+    case DocumentStatus.RELEASED:
       backgroundColor = Colors.success;
       break;
 
-    case "Pending":
-      backgroundColor = Colors.warning;
+    case DocumentStatus.COMPLETED:
+      backgroundColor = Colors.success;
       break;
   }
 
@@ -35,9 +39,7 @@ export default function StatusBadge({
         },
       ]}
     >
-      <AppText
-        style={styles.text}
-      >
+      <AppText style={styles.text}>
         {status}
       </AppText>
     </View>

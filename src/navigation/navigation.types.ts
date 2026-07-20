@@ -9,6 +9,7 @@ export type DocumentsStackParamList = {
   DocumentsList: undefined;
 
   ReceiveDocument: undefined;
+  OutgoingDocument: undefined;
 
   DocumentDetails: {
     documentId: string;

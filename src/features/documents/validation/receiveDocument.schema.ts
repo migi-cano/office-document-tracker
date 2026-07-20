@@ -1,27 +1,25 @@
 import { z } from "zod";
 
 export const receiveDocumentSchema = z.object({
+  title: z
+    .string()
+    .trim()
+    .min(1, "Document title is required."),
+
   subject: z
     .string()
     .trim()
     .min(1, "Subject is required."),
 
-  sender: z
-    .string()
-    .trim()
-    .min(1, "Sender is required."),
+  destination: z.string().trim().optional(),
 
-  receiver: z
-    .string()
-    .trim()
-    .min(1, "Receiver is required."),
+  departmentFrom: z.string().trim().optional(),
 
-  department: z
-    .string()
-    .trim()
-    .min(1, "Department is required."),
+  processedBy: z.string().trim().optional(),
 
-  remarks: z.string().optional(),
+  receivedBy: z.string().trim().optional(),
+
+  remarks: z.string().trim().optional(),
 });
 
 export type ReceiveDocumentFormData =

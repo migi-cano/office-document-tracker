@@ -1,20 +1,31 @@
-import AppCard from "../../common/AppCard";
-import AppText from "../../common/AppText";
+import { Pressable, View } from "react-native";
 
-import { StatCardProps } from "./StatCard.types";
+import { AppText } from "../../common";
+
 import { styles } from "./StatCard.styles";
+import { StatCardProps } from "./StatCard.types";
 
 export default function StatCard({
   title,
   value,
+  icon,
+  onPress,
 }: StatCardProps) {
   return (
-    <AppCard>
-      <AppText>{title}</AppText>
+    <Pressable onPress={onPress}>
+      <View style={styles.container}>
+        <AppText variant="heading">
+          {icon}
+        </AppText>
 
-      <AppText style={styles.value}>
-        {value}
-      </AppText>
-    </AppCard>
+        <AppText variant="title">
+          {value}
+        </AppText>
+
+        <AppText variant="caption">
+          {title}
+        </AppText>
+      </View>
+    </Pressable>
   );
 }

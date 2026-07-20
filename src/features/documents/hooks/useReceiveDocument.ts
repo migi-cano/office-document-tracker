@@ -13,10 +13,21 @@ export function useReceiveDocument(
     resolver: zodResolver(receiveDocumentSchema),
 
     defaultValues: {
+      title: initialValues?.title ?? "",
+
       subject: initialValues?.subject ?? "",
-      sender: initialValues?.sender ?? "",
-      receiver: initialValues?.receiver ?? "",
-      department: initialValues?.department ?? "",
+
+      destination: initialValues?.destination ?? "",
+
+      departmentFrom:
+        initialValues?.departmentFrom ?? "",
+
+      processedBy:
+        initialValues?.processedBy ?? "",
+
+      receivedBy:
+        initialValues?.receivedBy ?? "",
+
       remarks: initialValues?.remarks ?? "",
     },
 

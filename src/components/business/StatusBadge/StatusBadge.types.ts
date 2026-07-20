@@ -1,8 +1,5 @@
-export type StatusType =
-  | "Received"
-  | "Pending"
-  | "Released";
+import { DocumentStatus } from "../../../features/documents/types/document.types";
 
 export interface StatusBadgeProps {
-  status: StatusType;
+  status: DocumentStatus;
 }

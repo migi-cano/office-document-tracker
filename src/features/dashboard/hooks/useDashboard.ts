@@ -12,7 +12,6 @@ export function useDashboard() {
   const [receivedDocuments, setReceivedDocuments] = useState(0);
   const [pendingDocuments, setPendingDocuments] = useState(0);
   const [releasedDocuments, setReleasedDocuments] = useState(0);
-  const [highPriorityDocuments, setHighPriorityDocuments] = useState(0);
 
   const [recentDocuments, setRecentDocuments] = useState<Document[]>([]);
 
@@ -30,7 +29,6 @@ export function useDashboard() {
       setReceivedDocuments(statistics.receivedDocuments);
       setPendingDocuments(statistics.pendingDocuments);
       setReleasedDocuments(statistics.releasedDocuments);
-      setHighPriorityDocuments(statistics.highPriorityDocuments);
 
       setRecentDocuments(recent);
     } finally {
@@ -51,7 +49,6 @@ export function useDashboard() {
     receivedDocuments,
     pendingDocuments,
     releasedDocuments,
-    highPriorityDocuments,
 
     recentDocuments,
 

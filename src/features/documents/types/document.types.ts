@@ -1,31 +1,43 @@
-export type DocumentStatus =
-  | "Received"
-  | "Pending"
-  | "Released";
+export type DocumentType = "IN" | "OUT";
 
-export type DocumentPriority =
-  | "Low"
-  | "Normal"
-  | "High";
+
+export enum DocumentStatus {
+  PENDING = "PENDING",
+  RELEASED = "RELEASED",
+  RECEIVED = "RECEIVED",
+  COMPLETED = "COMPLETED",
+}
 
 export interface Document {
   id: string;
 
   trackingNumber: string;
+
+  documentType: DocumentType;
+
+  title: string;
+
   subject: string;
 
-  sender: string;
-  receiver: string;
+  destination?: string;
 
-  department: string;
+  departmentFrom?: string;
 
-  priority: DocumentPriority;
+  processedBy?: string;
+
+  receivedBy?: string;
+
   status: DocumentStatus;
 
-  remarks: string;
+  remarks?: string;
 
-  dateReceived: string;
+  documentDate: string;
+
+  attachmentUrl?: string;
+
+  ocrText?: string;
 
   createdAt: string;
+
   updatedAt: string;
 }

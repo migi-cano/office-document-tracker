@@ -4,7 +4,7 @@ class DashboardService {
   async getStatistics() {
     const { data, error } = await supabase
       .from("documents")
-      .select("status, priority");
+      .select("status");
 
     if (error) {
       throw error;
@@ -24,16 +24,12 @@ class DashboardService {
       d => d.status === "Released"
     ).length;
 
-    const highPriorityDocuments = data.filter(
-      d => d.priority === "High"
-    ).length;
 
     return {
       totalDocuments,
       receivedDocuments,
       pendingDocuments,
       releasedDocuments,
-      highPriorityDocuments,
     };
   }
 

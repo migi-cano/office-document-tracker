@@ -9,12 +9,10 @@ import {
 
 export const styles = StyleSheet.create({
   container: {
-  backgroundColor: Colors.surface,
-  borderRadius: Radius.lg,
-  padding: Spacing.lg,
-  alignItems: "center",
-  justifyContent: "center",
-  minHeight: 110,
-  ...Shadows.sm,
-}
+    backgroundColor: Colors.surface,
+    borderRadius: Radius.md,
+    padding: Spacing.md,
+    marginBottom: Spacing.md,
+    ...Shadows.sm,
+  },
 });

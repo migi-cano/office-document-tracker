@@ -13,42 +13,51 @@ import { documentService } from "../services/document.service";
 import { generateTrackingNumber } from "../utils/generateTrackingNumber";
 
 import { ReceiveDocumentFormData } from "../validation/receiveDocument.schema";
+import { DocumentStatus } from "../types/document.types";
 
 
 
 export default function ReceiveDocumentScreen() {
   const navigation = useNavigation();
 
-  async function handleCreate(
+ async function handleCreate(
   data: ReceiveDocumentFormData
 ) {
-  console.log("handleCreate called");
-  console.log(data);
+  const now = new Date().toISOString();
 
-  const now = new Date();
-
-await documentService.addDocument({
-  id: Date.now().toString(),
+  await documentService.addDocument({
+  id: "",
 
   trackingNumber: generateTrackingNumber(),
 
-  subject: data.subject,
-  sender: data.sender,
-  receiver: data.receiver,
-  department: data.department,
+  documentType: "IN",
 
-  priority: "Normal",
-  status: "Received",
+  title: data.title,
+
+  subject: data.subject,
+
+  departmentFrom: data.departmentFrom,
+
+  destination: "",
+
+  processedBy: "",
+
+  receivedBy: data.receivedBy,
+
+  status: DocumentStatus.RECEIVED,
 
   remarks: data.remarks ?? "",
 
-  dateReceived: now.toISOString(),
+  documentDate: now,
 
-  createdAt: now.toISOString(),
-  updatedAt: now.toISOString(),
+  ocrText: "",
+
+  attachmentUrl: "",
+
+  createdAt: now,
+
+  updatedAt: now,
 });
-
-    console.log("Document saved");
 
   navigation.goBack();
 }
@@ -63,7 +72,8 @@ await documentService.addDocument({
         />
 
         <DocumentForm
-          submitButtonTitle="Save Document"
+          documentType="IN"
+          submitButtonTitle="Save Incoming Document"
           onSubmit={handleCreate}
         />
       </ScreenContainer>

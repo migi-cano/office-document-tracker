@@ -11,6 +11,7 @@ import {
 import { useAuth } from "../../../providers/AuthProvider";
 import { useDashboard } from "../hooks/useDashboard";
 import { DashboardStatCard } from "../../../components/business";
+
 export default function DashboardScreen() {
   const { user, logout } = useAuth();
 
@@ -20,7 +21,6 @@ export default function DashboardScreen() {
     receivedDocuments,
     pendingDocuments,
     releasedDocuments,
-    highPriorityDocuments,
     recentDocuments,
   } = useDashboard();
 
@@ -67,11 +67,9 @@ export default function DashboardScreen() {
               icon="checkmark-circle"
           />
 
-          <DashboardStatCard
-              title="High Priority"
-              value={highPriorityDocuments}
-              icon="alert-circle"
-          />
+          <AppText>
+            Total Documents: {totalDocuments}
+          </AppText>
 
           <AppText>
             Received Documents: {receivedDocuments}
@@ -83,10 +81,6 @@ export default function DashboardScreen() {
 
           <AppText>
             Released Documents: {releasedDocuments}
-          </AppText>
-
-          <AppText>
-            High Priority: {highPriorityDocuments}
           </AppText>
         </AppCard>
 
