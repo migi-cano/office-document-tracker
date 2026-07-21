@@ -8,7 +8,11 @@ export type RootStackParamList = {
 export type DocumentsStackParamList = {
   DocumentsList: undefined;
 
-  ReceiveDocument: undefined;
+  ReceiveDocument: {
+    ocrText?: string;
+    imageUri?: string;
+  };
+
   OutgoingDocument: undefined;
 
   DocumentDetails: {

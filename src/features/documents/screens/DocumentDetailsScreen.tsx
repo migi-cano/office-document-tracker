@@ -24,7 +24,10 @@ import { DetailRow } from "../../../components/business";
 import HistoryItem from "../../../components/business/HistoryItem";
 
 import { documentService } from "../services/document.service";
-import { Document } from "../types/document.types";
+import {
+  Document,
+  DocumentStatus,
+} from "../types/document.types";
 
 import {
   DocumentsStackParamList,
@@ -46,6 +49,7 @@ type NavigationProps =
 export default function DocumentDetailsScreen() {
   const route = useRoute<RouteProps>();
   const navigation = useNavigation<NavigationProps>();
+  const [updatingStatus, setUpdatingStatus] = useState(false);
 
   const [document, setDocument] =
     useState<Document>();
@@ -103,6 +107,81 @@ export default function DocumentDetailsScreen() {
       ]
     );
   }
+
+ function getNextStatus(): DocumentStatus | null {
+  if (!document) return null;
+
+  if (document.documentType === "OUT") {
+    switch (document.status) {
+      case DocumentStatus.PENDING:
+        return DocumentStatus.RELEASED;
+
+      case DocumentStatus.RELEASED:
+        return DocumentStatus.COMPLETED;
+
+      default:
+        return null;
+    }
+  }
+
+  if (document.documentType === "IN") {
+    switch (document.status) {
+      case DocumentStatus.RECEIVED:
+        return DocumentStatus.COMPLETED;
+
+      default:
+        return null;
+    }
+  }
+
+  return null;
+}
+
+function getStatusButtonTitle() {
+  if (!document) return "";
+
+  if (document.documentType === "OUT") {
+    switch (document.status) {
+      case DocumentStatus.PENDING:
+        return "Release Document";
+
+      case DocumentStatus.RELEASED:
+        return "Complete Document";
+
+      default:
+        return "";
+    }
+  }
+
+  if (document.documentType === "IN") {
+    switch (document.status) {
+      case DocumentStatus.RECEIVED:
+        return "Complete Document";
+
+      default:
+        return "";
+    }
+  }
+
+  return "";
+}
+
+async function handleStatusUpdate() {
+  if (!document) return;
+
+  const nextStatus = getNextStatus();
+
+  if (!nextStatus) return;
+
+  const updated = await documentService.updateStatus(
+    document.id,
+    nextStatus
+  );
+
+  setDocument(updated);
+
+  await refresh();
+}
 
   return (
     <SafeScreen>
@@ -163,6 +242,14 @@ export default function DocumentDetailsScreen() {
             value={document.status}
           />
 
+          {getNextStatus() && (
+            <AppButton
+              title={getStatusButtonTitle()}
+              onPress={handleStatusUpdate}
+              disabled={updatingStatus}
+            />
+          )}
+
           <DetailRow
             label="Remarks"
             value={document.remarks ?? ""}
@@ -172,6 +259,7 @@ export default function DocumentDetailsScreen() {
             label="Document Date"
             value={document.documentDate}
           />
+          
 
           <AppButton
             title="Edit"
@@ -186,6 +274,7 @@ export default function DocumentDetailsScreen() {
             title="Delete Document"
             onPress={confirmDelete}
           />
+          
 
           <AppText
             variant="heading"

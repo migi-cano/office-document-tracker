@@ -12,46 +12,55 @@ export function useDashboard() {
   const [receivedDocuments, setReceivedDocuments] = useState(0);
   const [pendingDocuments, setPendingDocuments] = useState(0);
   const [releasedDocuments, setReleasedDocuments] = useState(0);
-
   const [recentDocuments, setRecentDocuments] = useState<Document[]>([]);
+  const [completedDocuments, setCompletedDocuments] = useState(0);
+  const [incomingDocuments, setIncomingDocuments] = useState(0);
+  const [outgoingDocuments, setOutgoingDocuments] = useState(0);
 
-  async function loadDashboard() {
-    try {
-      setLoading(true);
+async function loadDashboard() {
+  try {
+    setLoading(true);
 
-      const statistics =
-        await dashboardService.getStatistics();
+    const statistics =
+      await dashboardService.getStatistics();
 
-      const recent =
-        await dashboardService.getRecentDocuments();
+    const recent =
+      await dashboardService.getRecentDocuments();
 
-      setTotalDocuments(statistics.totalDocuments);
-      setReceivedDocuments(statistics.receivedDocuments);
-      setPendingDocuments(statistics.pendingDocuments);
-      setReleasedDocuments(statistics.releasedDocuments);
+    setTotalDocuments(statistics.totalDocuments);
+    setReceivedDocuments(statistics.receivedDocuments);
+    setPendingDocuments(statistics.pendingDocuments);
+    setReleasedDocuments(statistics.releasedDocuments);
+    setCompletedDocuments(statistics.completedDocuments);
+    setIncomingDocuments(statistics.incomingDocuments);
+    setOutgoingDocuments(statistics.outgoingDocuments);
 
-      setRecentDocuments(recent);
-    } finally {
-      setLoading(false);
-    }
+    setRecentDocuments(recent);
+  } finally {
+    setLoading(false);
   }
+}
 
-  useFocusEffect(
-    useCallback(() => {
-      loadDashboard();
-    }, [])
-  );
+useFocusEffect(
+  useCallback(() => {
+    loadDashboard();
+  }, [])
+);
 
   return {
-    loading,
+  loading,
 
-    totalDocuments,
-    receivedDocuments,
-    pendingDocuments,
-    releasedDocuments,
+  totalDocuments,
+  receivedDocuments,
+  pendingDocuments,
+  releasedDocuments,
+  completedDocuments,
 
-    recentDocuments,
+  incomingDocuments,
+  outgoingDocuments,
 
-    refresh: loadDashboard,
-  };
+  recentDocuments,
+
+  refresh: loadDashboard,
+};
 }

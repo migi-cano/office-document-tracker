@@ -12,6 +12,9 @@ export default function DocumentForm({
   submitButtonTitle = "Save Document",
   onSubmit,
 }: DocumentFormProps) {
+
+  console.log("=== DOCUMENT FORM ===");
+console.log(initialValues);
   
   
   const {

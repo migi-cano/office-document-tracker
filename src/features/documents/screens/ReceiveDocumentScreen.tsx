@@ -1,4 +1,10 @@
-import { useNavigation } from "@react-navigation/native";
+import {
+  useNavigation,
+  useRoute,
+  RouteProp,
+} from "@react-navigation/native";
+
+import { DocumentsStackParamList } from "../../../navigation/navigation.types";
 
 import {
   AppHeader,
@@ -14,11 +20,30 @@ import { generateTrackingNumber } from "../utils/generateTrackingNumber";
 
 import { ReceiveDocumentFormData } from "../validation/receiveDocument.schema";
 import { DocumentStatus } from "../types/document.types";
+import { parseOcr } from "../utils/parseOcr";
 
 
 
 export default function ReceiveDocumentScreen() {
   const navigation = useNavigation();
+
+  type ReceiveDocumentRouteProp = RouteProp<
+  DocumentsStackParamList,
+  "ReceiveDocument"
+>;
+
+  const route = useRoute<ReceiveDocumentRouteProp>();
+
+
+
+  const ocrText = route.params?.ocrText ?? "";
+  console.log("=== RECEIVE SCREEN ===");
+console.log(route.params);
+console.log(ocrText);
+  const imageUri = route.params?.imageUri ?? "";
+  const parsed = parseOcr(ocrText);
+  console.log("=== PARSED ===");
+console.log(parsed);
 
  async function handleCreate(
   data: ReceiveDocumentFormData
@@ -50,9 +75,9 @@ export default function ReceiveDocumentScreen() {
 
   documentDate: now,
 
-  ocrText: "",
+  ocrText,
 
-  attachmentUrl: "",
+  attachmentUrl: imageUri,
 
   createdAt: now,
 
@@ -70,12 +95,18 @@ export default function ReceiveDocumentScreen() {
           title="Receive Document"
           subtitle="Create a new incoming document"
         />
+        
 
         <DocumentForm
-          documentType="IN"
-          submitButtonTitle="Save Incoming Document"
-          onSubmit={handleCreate}
-        />
+            documentType="IN"
+           initialValues={{
+          title: parsed.title,
+          subject: parsed.subject,
+        }}
+            submitButtonTitle="Save Incoming Document"
+            onSubmit={handleCreate}
+          />
+
       </ScreenContainer>
       </ScrollableScreen>
     </SafeScreen>

@@ -1,4 +1,5 @@
 import { CameraView } from "expo-camera";
+import { Image, View, Alert } from "react-native";
 
 import {
   AppHeader,
@@ -7,15 +8,26 @@ import {
 } from "../../../components/layout";
 
 import AppText from "../../../components/common/AppText";
-
-import { useScanner } from "../hooks/useScanner";
-import { Image, View } from "react-native";
-
 import AppButton from "../../../components/common/AppButton";
 
+import { useScanner } from "../hooks/useScanner";
 import { useCameraCapture } from "../hooks/useCameraCapture";
+import { ocrService } from "../services/ocr.service";
+
+import { useNavigation } from "@react-navigation/native";
+import type { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
+
+import { MainTabParamList } from "../../../navigation/navigation.types";
+
+type ScannerNavigationProp = BottomTabNavigationProp<
+  MainTabParamList,
+  "Scanner"
+>;
+
 export default function ScannerScreen() {
+  const navigation = useNavigation<ScannerNavigationProp>();
   const { permission } = useScanner();
+  
 
   const {
   cameraRef,
@@ -23,6 +35,7 @@ export default function ScannerScreen() {
   capturePhoto,
   retakePhoto,
 } = useCameraCapture();
+
 
 
   if (!permission) {
@@ -40,6 +53,62 @@ export default function ScannerScreen() {
       </SafeScreen>
     );
   }
+
+  const handleTestOCR = async () => {
+  if (!photoUri) {
+    Alert.alert("No image", "Please capture a document first.");
+    return;
+  }
+
+  try {
+    const result = await ocrService.extractDocument(photoUri);
+
+    console.log("===== OCR RESULT =====");
+    console.log(result);
+    console.log(result.fullText);
+
+    Alert.alert(
+      "OCR Success",
+      result.fullText || "No text detected."
+    );
+  } catch (error) {
+    console.error(error);
+    Alert.alert(
+      "OCR Failed",
+      error instanceof Error ? error.message : "Unknown error"
+    );
+  }
+};
+
+const handleContinue = async () => {
+  if (!photoUri) {
+    Alert.alert("No image", "Please capture a document first.");
+    return;
+  }
+
+  try {
+    const result = await ocrService.extractDocument(photoUri);
+
+    console.log("=== SCANNER ===");
+    console.log(result.fullText);
+    console.log(photoUri);
+
+    navigation.navigate("Documents", {
+      screen: "ReceiveDocument",
+      params: {
+        ocrText: result.fullText,
+        imageUri: photoUri,
+      },
+    });
+  } catch (error) {
+    console.error(error);
+
+    Alert.alert(
+      "OCR Failed",
+      error instanceof Error ? error.message : "Unknown error"
+    );
+  }
+};
 
   return (
     <SafeScreen>
@@ -67,11 +136,16 @@ export default function ScannerScreen() {
     />
 
     <AppButton
-      title="Continue"
-      onPress={() => {}}
+      title="Test OCR"
+      onPress={handleTestOCR}
     />
-        </View>
-      ) : (
+
+    <AppButton
+      title="Continue"
+      onPress={handleContinue}
+    />
+  </View>
+) : (
         <View style={{ flex: 1 }}>
           <CameraView
             ref={cameraRef}

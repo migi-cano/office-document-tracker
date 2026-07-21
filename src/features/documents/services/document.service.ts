@@ -69,13 +69,25 @@ const toDocument = (row: any): Document => ({
 });
 
 class DocumentService {
-  async getDocuments(): Promise<Document[]> {
-    const { data, error } = await supabase
-      .from("documents")
-      .select("*")
-      .order("created_at", {
-        ascending: false,
-      });
+  async getDocuments(search?: string): Promise<Document[]> {
+    let query = supabase
+  .from("documents")
+  .select("*")
+  .order("created_at", {
+    ascending: false,
+  });
+
+if (search && search.trim() !== "") {
+  query = query.or(
+    [
+      `tracking_number.ilike.%${search}%`,
+      `title.ilike.%${search}%`,
+      `subject.ilike.%${search}%`,
+    ].join(",")
+  );
+}
+
+const { data, error } = await query;
 
     if (error) {
       throw error;
@@ -205,47 +217,27 @@ class DocumentService {
 }
 
   async updateStatus(
-  id: string,
+  documentId: string,
   status: DocumentStatus
-): Promise<Document | undefined> {
-  // Get the current document first
-  const current = await this.getDocumentById(id);
-
-  if (!current) {
-    return undefined;
-  }
-
-  // Update the document
-  const { data, error } = await supabase
+) {
+  const { error } = await supabase
     .from("documents")
     .update({
       status,
       updated_at: new Date().toISOString(),
     })
-    .eq("id", id)
-    .select()
-    .single();
+    .eq("id", documentId);
 
   if (error) {
-    return undefined;
+    throw error;
   }
 
-  const updated = toDocument(data);
-
   await documentHistoryService.addHistory({
-    documentId: updated.id,
-    action: DocumentHistoryAction.STATUS_CHANGED,
-    oldStatus: undefined,
-    newStatus: undefined,
-    department:
-      updated.documentType === "IN"
-        ? updated.departmentFrom
-        : updated.destination,
-    remarks: `Status changed from ${current.status} to ${updated.status}`,
-    performedBy: "System",
+    documentId,
+    action: `Status updated to ${status}`,
   });
 
-  return updated;
+  return this.getDocumentById(documentId);
 }
 }
 export const documentService = new DocumentService();

@@ -2,10 +2,12 @@ import AppButton from "../../../components/common/AppButton";
 import AppCard from "../../../components/common/AppCard";
 import AppText from "../../../components/common/AppText";
 
+
 import {
   AppHeader,
   SafeScreen,
   ScreenContainer,
+  ScrollableScreen,
 } from "../../../components/layout";
 
 import { useAuth } from "../../../providers/AuthProvider";
@@ -16,13 +18,16 @@ export default function DashboardScreen() {
   const { user, logout } = useAuth();
 
   const {
-    loading,
-    totalDocuments,
-    receivedDocuments,
-    pendingDocuments,
-    releasedDocuments,
-    recentDocuments,
-  } = useDashboard();
+  loading,
+  totalDocuments,
+  receivedDocuments,
+  pendingDocuments,
+  releasedDocuments,
+  completedDocuments,
+  incomingDocuments,
+  outgoingDocuments,
+  recentDocuments,
+} = useDashboard();
 
   if (loading) {
     return (
@@ -36,6 +41,7 @@ export default function DashboardScreen() {
 
   return (
     <SafeScreen>
+      <ScrollableScreen>
       <ScreenContainer>
         <AppHeader
           title="Office Document Tracker"
@@ -67,21 +73,23 @@ export default function DashboardScreen() {
               icon="checkmark-circle"
           />
 
-          <AppText>
-            Total Documents: {totalDocuments}
-          </AppText>
+          <DashboardStatCard
+              title="Completed"
+              value={completedDocuments}
+              icon="checkmark-done"
+            />
 
-          <AppText>
-            Received Documents: {receivedDocuments}
-          </AppText>
+            <DashboardStatCard
+              title="Incoming"
+              value={incomingDocuments}
+              icon="download"
+            />
 
-          <AppText>
-            Pending Documents: {pendingDocuments}
-          </AppText>
-
-          <AppText>
-            Released Documents: {releasedDocuments}
-          </AppText>
+            <DashboardStatCard
+              title="Outgoing"
+              value={outgoingDocuments}
+              icon="paper-plane"
+            />
         </AppCard>
 
         <AppCard>
@@ -99,6 +107,7 @@ export default function DashboardScreen() {
           onPress={logout}
         />
       </ScreenContainer>
+      </ScrollableScreen>
     </SafeScreen>
   );
 }

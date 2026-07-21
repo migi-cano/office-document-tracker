@@ -21,6 +21,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { DocumentsStackParamList } from "../../../navigation/navigation.types";
 import { DocumentStatus } from "../types/document.types";
 import StatCard from "../../../components/business/StatCard";
+import { useDebounce } from "../../../hooks/useDebounce";
 
 
 
@@ -31,11 +32,15 @@ type DocumentsNavigationProp =
 
 const navigation =
   useNavigation<DocumentsNavigationProp>();
- const {
+
+const [search, setSearch] = useState("");
+const debouncedSearch = useDebounce(search);
+
+const {
   documents,
   loading,
   refresh,
-} = useDocuments();
+} = useDocuments(debouncedSearch);
 
 // Dashboard statistics
 const incoming = documents.filter(
@@ -54,50 +59,22 @@ const completed = documents.filter(
   (d) => d.status === DocumentStatus.COMPLETED
 ).length;
 
-const [search, setSearch] = useState("");
 const [filter, setFilter] =
   useState<"ALL" | "IN" | "OUT">("ALL");
 const [statusFilter, setStatusFilter] =
   useState<DocumentStatus | "ALL">("ALL");
 
 const filteredDocuments = useMemo(() => {
-  const keyword = search.toLowerCase();
-
   return documents.filter((document) => {
-    const matchesSearch =
-      document.title.toLowerCase().includes(keyword) ||
-      document.subject.toLowerCase().includes(keyword) ||
-      document.trackingNumber
-        .toLowerCase()
-        .includes(keyword) ||
-      (document.destination ?? "")
-        .toLowerCase()
-        .includes(keyword) ||
-      (document.departmentFrom ?? "")
-        .toLowerCase()
-        .includes(keyword) ||
-      (document.processedBy ?? "")
-        .toLowerCase()
-        .includes(keyword) ||
-      (document.receivedBy ?? "")
-        .toLowerCase()
-        .includes(keyword);
-
     const matchesType =
-      filter === "ALL" ||
-      document.documentType === filter;
+      filter === "ALL" || document.documentType === filter;
 
     const matchesStatus =
-      statusFilter === "ALL" ||
-      document.status === statusFilter;
+      statusFilter === "ALL" || document.status === statusFilter;
 
-    return (
-      matchesSearch &&
-      matchesType &&
-      matchesStatus
-    );
+    return matchesType && matchesStatus;
   });
-}, [documents, search, filter, statusFilter]);
+}, [documents, filter, statusFilter]);
 
 
  return (
@@ -169,9 +146,9 @@ const filteredDocuments = useMemo(() => {
       </View>
 
       <SearchBar
-        value={search}
-        onChangeText={setSearch}
-      />
+          value={search}
+          onChangeText={setSearch}
+        />
 
         <FlatList
             data={filteredDocuments}
@@ -201,8 +178,13 @@ const filteredDocuments = useMemo(() => {
 
             <Button
                 title="Open Receive Document"
-                onPress={() => navigation.navigate("ReceiveDocument")}
-                />
+                onPress={() =>
+                  navigation.navigate({
+                    name: "ReceiveDocument",
+                    params: {},
+                  })
+                }
+              />
 
                 <Button
                     title="Open Outgoing Document"
