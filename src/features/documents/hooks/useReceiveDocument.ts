@@ -17,52 +17,17 @@ console.log(initialValues);
     resolver: zodResolver(receiveDocumentSchema),
 
     defaultValues: {
-      title: initialValues?.title ?? "",
+        title: initialValues?.title ?? "",
+        documentType: initialValues?.documentType ?? "",
+        subject: initialValues?.subject ?? "",
 
-      subject: initialValues?.subject ?? "",
-
-      destination: initialValues?.destination ?? "",
-
-      departmentFrom:
-        initialValues?.departmentFrom ?? "",
-
-      processedBy:
-        initialValues?.processedBy ?? "",
-
-      receivedBy:
-        initialValues?.receivedBy ?? "",
-
-      remarks: initialValues?.remarks ?? "",
-    },
+        destination: initialValues?.destination ?? "",
+        departmentFrom: initialValues?.departmentFrom ?? "",
+        processedBy: initialValues?.processedBy ?? "",
+        receivedBy: initialValues?.receivedBy ?? "",
+        remarks: initialValues?.remarks ?? "",
+      },
 
     mode: "onTouched",
   });
-  const form = useForm<ReceiveDocumentFormData>({
-  resolver: zodResolver(receiveDocumentSchema),
-  defaultValues: {
-    title: "",
-    subject: "",
-    destination: "",
-    departmentFrom: "",
-    processedBy: "",
-    receivedBy: "",
-    remarks: "",
-  },
-});
-
-useEffect(() => {
-  if (initialValues) {
-    form.reset({
-      title: initialValues.title ?? "",
-      subject: initialValues.subject ?? "",
-      destination: initialValues.destination ?? "",
-      departmentFrom: initialValues.departmentFrom ?? "",
-      processedBy: initialValues.processedBy ?? "",
-      receivedBy: initialValues.receivedBy ?? "",
-      remarks: initialValues.remarks ?? "",
-    });
-  }
-}, [initialValues, form]);
-
-return form;
 }

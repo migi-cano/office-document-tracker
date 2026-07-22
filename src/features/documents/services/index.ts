@@ -1,1 +1,1 @@
-export * from "../../scanner/services/ocr.service";
+export * from "../../../services/ocr.service";

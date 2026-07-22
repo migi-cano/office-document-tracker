@@ -72,6 +72,28 @@ console.log(initialValues);
         )}
       />
 
+      {/* Document Type */}
+<Controller
+  control={control}
+  name="documentType"
+  render={({ field, fieldState }) => (
+    <>
+      <AppInput
+        label="Document Type"
+        placeholder="Enter document type"
+        value={field.value}
+        onChangeText={field.onChange}
+      />
+
+      {fieldState.error && (
+        <AppText style={{ color: "red" }}>
+          {fieldState.error.message}
+        </AppText>
+      )}
+    </>
+  )}
+/>
+
       {/* Remarks */}
       <Controller
         control={control}

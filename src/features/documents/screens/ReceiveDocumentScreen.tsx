@@ -39,11 +39,12 @@ export default function ReceiveDocumentScreen() {
   const ocrText = route.params?.ocrText ?? "";
   console.log("=== RECEIVE SCREEN ===");
 console.log(route.params);
-console.log(ocrText);
   const imageUri = route.params?.imageUri ?? "";
+  const aiTitle = route.params?.title ?? "";
+const aiSubject = route.params?.subject ?? "";
   const parsed = parseOcr(ocrText);
+  const aiDocumentType = route.params?.documentType ?? "";
   console.log("=== PARSED ===");
-console.log(parsed);
 
  async function handleCreate(
   data: ReceiveDocumentFormData
@@ -99,9 +100,10 @@ console.log(parsed);
 
         <DocumentForm
             documentType="IN"
-           initialValues={{
-          title: parsed.title,
-          subject: parsed.subject,
+            initialValues={{
+            title: aiTitle || parsed.title,
+            subject: aiSubject || parsed.subject,
+            documentType: aiDocumentType,
         }}
             submitButtonTitle="Save Incoming Document"
             onSubmit={handleCreate}

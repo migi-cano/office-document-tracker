@@ -1,6 +1,6 @@
 import * as FileSystem from "expo-file-system/legacy";
-import { documentParser } from "./documentParser.service";
-import { ExtractedDocument } from "../../scanner/types/ocr.types";
+import { documentParser } from "../features/scanner/services/documentParser.service";
+import { ExtractedDocument } from "../features/scanner/types/ocr.types";
 
 class OCRService {
   async extractDocument(

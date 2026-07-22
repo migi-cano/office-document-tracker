@@ -12,12 +12,13 @@ import AppButton from "../../../components/common/AppButton";
 
 import { useScanner } from "../hooks/useScanner";
 import { useCameraCapture } from "../hooks/useCameraCapture";
-import { ocrService } from "../services/ocr.service";
+import { ocrService } from "../../../services/ocr.service";
 
 import { useNavigation } from "@react-navigation/native";
 import type { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
 
 import { MainTabParamList } from "../../../navigation/navigation.types";
+import { documentAIService } from "../../../services/documentAi.service";
 
 type ScannerNavigationProp = BottomTabNavigationProp<
   MainTabParamList,
@@ -87,25 +88,38 @@ const handleContinue = async () => {
   }
 
   try {
-    const result = await ocrService.extractDocument(photoUri);
+    // OCR.Space
+    const ocr = await ocrService.extractDocument(photoUri);
 
-    console.log("=== SCANNER ===");
-    console.log(result.fullText);
-    console.log(photoUri);
+    console.log("OCR:");
+    console.log(ocr.fullText);
+
+    // Gemini
+    const ai = await documentAIService.extractDocument(
+      ocr.fullText
+    );
+
+    console.log("Gemini:");
+    console.log(ai);
 
     navigation.navigate("Documents", {
-      screen: "ReceiveDocument",
-      params: {
-        ocrText: result.fullText,
-        imageUri: photoUri,
-      },
-    });
+  screen: "ReceiveDocument",
+  params: {
+    imageUri: photoUri,
+    ocrText: ocr.fullText,
+    title: ai.title,
+    subject: ai.subject,
+    documentType: ai.documentType,
+  },
+});
   } catch (error) {
     console.error(error);
 
     Alert.alert(
-      "OCR Failed",
-      error instanceof Error ? error.message : "Unknown error"
+      "Failed",
+      error instanceof Error
+        ? error.message
+        : "Unknown error"
     );
   }
 };
