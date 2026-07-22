@@ -6,33 +6,38 @@ import DocumentDetailsScreen from "../features/documents/screens/DocumentDetails
 
 import { DocumentsStackParamList } from "./navigation.types";
 import EditDocumentScreen from "../features/documents/screens/EditDocumentScreen";
+import OutgoingDocumentScreen from "../features/documents/screens/OutgoingDocumentScreen";
 
 const Stack = createNativeStackNavigator<DocumentsStackParamList>();
 
 export default function DocumentsNavigator() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen
-        name="DocumentsList"
-        component={DocumentsScreen}
-      />
+  <Stack.Screen
+    name="DocumentsList"
+    component={DocumentsScreen}
+  />
 
-      <Stack.Screen
-        name="ReceiveDocument"
-        component={ReceiveDocumentScreen}
-      />
+  <Stack.Screen
+    name="ReceiveDocument"
+    component={ReceiveDocumentScreen}
+  />
 
-      <Stack.Screen
-        name="DocumentDetails"
-        component={DocumentDetailsScreen}
-      />
+  <Stack.Screen
+    name="OutgoingDocument"
+    component={OutgoingDocumentScreen}
+  />
 
-      <Stack.Screen
-        name="EditDocument"
-        component={EditDocumentScreen}
-      />
-    </Stack.Navigator>
+  <Stack.Screen
+    name="DocumentDetails"
+    component={DocumentDetailsScreen}
+  />
 
+  <Stack.Screen
+    name="EditDocument"
+    component={EditDocumentScreen}
+  />
+</Stack.Navigator>
     
   );
 }

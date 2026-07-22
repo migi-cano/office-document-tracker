@@ -1,7 +1,5 @@
-import { FlatList } from "react-native";
-
-
-import {AppText,EmptyState,} from "../../../components/common";
+import { FlatList, View } from "react-native";
+import {EmptyState,} from "../../../components/common";
 
 import { useMemo, useState } from "react";
 
@@ -21,6 +19,10 @@ import { Button } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { DocumentsStackParamList } from "../../../navigation/navigation.types";
+import { DocumentStatus } from "../types/document.types";
+import StatCard from "../../../components/business/StatCard";
+import { useDebounce } from "../../../hooks/useDebounce";
+
 
 
 
@@ -30,52 +32,123 @@ type DocumentsNavigationProp =
 
 const navigation =
   useNavigation<DocumentsNavigationProp>();
- const {
+
+const [search, setSearch] = useState("");
+const debouncedSearch = useDebounce(search);
+
+const {
   documents,
   loading,
   refresh,
-} = useDocuments();
+} = useDocuments(debouncedSearch);
 
-  const [search, setSearch] = useState("");
+// Dashboard statistics
+const incoming = documents.filter(
+  (d) => d.documentType === "IN"
+).length;
 
-  const filteredDocuments = useMemo(() => {
-  const keyword = search.toLowerCase();
+const outgoing = documents.filter(
+  (d) => d.documentType === "OUT"
+).length;
 
-  
+const pending = documents.filter(
+  (d) => d.status === DocumentStatus.PENDING
+).length;
 
+const completed = documents.filter(
+  (d) => d.status === DocumentStatus.COMPLETED
+).length;
+
+const [filter, setFilter] =
+  useState<"ALL" | "IN" | "OUT">("ALL");
+const [statusFilter, setStatusFilter] =
+  useState<DocumentStatus | "ALL">("ALL");
+
+const filteredDocuments = useMemo(() => {
   return documents.filter((document) => {
-    return (
-      document.subject
-        .toLowerCase()
-        .includes(keyword) ||
+    const matchesType =
+      filter === "ALL" || document.documentType === filter;
 
-      document.trackingNumber
-        .toLowerCase()
-        .includes(keyword) ||
+    const matchesStatus =
+      statusFilter === "ALL" || document.status === statusFilter;
 
-      document.sender
-        .toLowerCase()
-        .includes(keyword) ||
-
-      document.receiver
-        .toLowerCase()
-        .includes(keyword)
-    );
+    return matchesType && matchesStatus;
   });
-}, [documents, search]);
+}, [documents, filter, statusFilter]);
 
-  return (
-    <SafeScreen>
-      <ScreenContainer>
-        <AppHeader
-        title={`Documents (${filteredDocuments.length})`}
+
+ return (
+  <SafeScreen>
+    <ScreenContainer>
+
+      <AppHeader
+        title={`${
+          filter === "ALL"
+            ? "All Documents"
+            : filter === "IN"
+            ? "Incoming Documents"
+            : "Outgoing Documents"
+        } (${filteredDocuments.length})`}
         subtitle="Office Document Tracker"
-        />
+      />
 
-        <SearchBar
-  value={search}
-  onChangeText={setSearch}
-/>
+      {/* Dashboard Statistics */}
+      <View style={{ flexDirection: "row", gap: 12 }}>
+        <View style={{ flex: 1 }}>
+          <StatCard
+            title="Incoming"
+            value={incoming}
+            icon="📥"
+            onPress={() => {
+              setFilter("IN");
+              setStatusFilter("ALL");
+            }}
+          />
+        </View>
+
+        <View style={{ flex: 1 }}>
+          <StatCard
+            title="Outgoing"
+            value={outgoing}
+            icon="📤"
+            onPress={() => {
+              setFilter("OUT");
+              setStatusFilter("ALL");
+            }}
+          />
+        </View>
+      </View>
+
+      <View style={{ flexDirection: "row", gap: 12 }}>
+        <View style={{ flex: 1 }}>
+          <StatCard
+            title="Pending"
+            value={pending}
+            icon="⏳"
+            onPress={() => {
+              setFilter("ALL");
+              setStatusFilter(DocumentStatus.PENDING);
+            }}
+          />
+        </View>
+
+        <View style={{ flex: 1 }}>
+          <StatCard
+            title="Completed"
+            value={completed}
+            icon="✅"
+            onPress={() => {
+              setFilter("ALL");
+              setStatusFilter(DocumentStatus.COMPLETED);
+            }}
+          />
+        </View>
+      </View>
+
+      <SearchBar
+          value={search}
+          onChangeText={setSearch}
+        />
 
         <FlatList
             data={filteredDocuments}
@@ -105,8 +178,21 @@ const navigation =
 
             <Button
                 title="Open Receive Document"
-                onPress={() => navigation.navigate("ReceiveDocument")}
+                onPress={() =>
+                  navigation.navigate({
+                    name: "ReceiveDocument",
+                    params: {},
+                  })
+                }
+              />
+
+                <Button
+                    title="Open Outgoing Document"
+                    onPress={() =>
+                        navigation.navigate("OutgoingDocument")
+                    }
                 />
+                
       </ScreenContainer>
     </SafeScreen>
   );

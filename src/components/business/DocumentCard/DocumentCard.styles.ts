@@ -17,7 +17,10 @@ export const styles = StyleSheet.create({
   },
 
   header: {
-    marginBottom: Spacing.sm,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: Spacing.md,
   },
 
   subject: {
@@ -26,8 +29,6 @@ export const styles = StyleSheet.create({
 
   footer: {
     marginTop: Spacing.md,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+    alignItems: "flex-end",
   },
 });

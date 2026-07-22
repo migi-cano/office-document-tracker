@@ -1,170 +1,302 @@
-import { useEffect, useState } from "react";
-import {RouteProp,useRoute,useFocusEffect,} from "@react-navigation/native";
-import { useCallback } from "react";
-import {AppHeader,SafeScreen,ScreenContainer,ScrollableScreen} from "../../../components/layout";
-import {AppText,} from "../../../components/common";
-import { documentService } from "../services/document.service";
-import { Document } from "../types/document.types";
-import { DocumentsStackParamList } from "../../../navigation/navigation.types";
-import { DetailRow } from "../../../components/business";
-import { AppButton } from "../../../components/common";
-import { useNavigation } from "@react-navigation/native";
+import { useCallback, useState } from "react";
+import {
+  RouteProp,
+  useRoute,
+  useFocusEffect,
+  useNavigation,
+} from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { Alert } from "react-native";
+import { Alert, FlatList } from "react-native";
 
-type RouteProps =
-    RouteProp<
-        DocumentsStackParamList,
-        "DocumentDetails"
-    >;
+import {
+  AppHeader,
+  SafeScreen,
+  ScreenContainer,
+  ScrollableScreen,
+} from "../../../components/layout";
 
-type NavigationProps = NativeStackNavigationProp<
+import {
+  AppButton,
+  AppText,
+} from "../../../components/common";
+
+import { DetailRow } from "../../../components/business";
+import HistoryItem from "../../../components/business/HistoryItem";
+
+import { documentService } from "../services/document.service";
+import {
+  Document,
+  DocumentStatus,
+} from "../types/document.types";
+
+import {
+  DocumentsStackParamList,
+} from "../../../navigation/navigation.types";
+
+import { useDocumentHistory } from "../history";
+
+type RouteProps = RouteProp<
   DocumentsStackParamList,
   "DocumentDetails"
 >;
 
+type NavigationProps =
+  NativeStackNavigationProp<
+    DocumentsStackParamList,
+    "DocumentDetails"
+  >;
+
 export default function DocumentDetailsScreen() {
-    const route = useRoute<RouteProps>();
-    const navigation = useNavigation<NavigationProps>();
+  const route = useRoute<RouteProps>();
+  const navigation = useNavigation<NavigationProps>();
+  const [updatingStatus, setUpdatingStatus] = useState(false);
 
-    const [document, setDocument] =
-        useState<Document>();
+  const [document, setDocument] =
+    useState<Document>();
 
-    useFocusEffect(
-      useCallback(() => {
-        async function load() {
-          const data =
-            await documentService.getDocumentById(
-              route.params.documentId
-            );
+  const {
+    history,
+    refresh,
+  } = useDocumentHistory(route.params.documentId);
 
-          setDocument(data);
-        }
+  useFocusEffect(
+    useCallback(() => {
+      async function load() {
+        const data =
+          await documentService.getDocumentById(
+            route.params.documentId
+          );
 
-        load();
-      }, [route.params.documentId])
-    );
+        setDocument(data);
 
-    if (!document) {
-        return null;
-    }
-    async function handleDelete() {
-        if (!document) return;
-
-        await documentService.deleteDocument(document.id);
-
-        navigation.goBack();
+        await refresh();
       }
 
-      function confirmDelete() {
-            Alert.alert(
-              "Delete Document",
-              "Are you sure you want to delete this document?",
-              [
-                {
-                  text: "Cancel",
-                  style: "cancel",
-                },
-                {
-                  text: "Delete",
-                  style: "destructive",
-                  onPress: handleDelete,
-                },
-              ]
-            );
-          }
+      load();
+    }, [route.params.documentId, refresh])
+  );
 
-    return (
-        <SafeScreen>
-          <ScrollableScreen>
-            <ScreenContainer>
+  if (!document) {
+    return null;
+  }
 
-                <AppHeader
-                    title="Document Details"
-                />
+  async function handleDelete() {
+    const currentDocument = document;
 
-                <AppText>
-                    {document.trackingNumber}
-                </AppText>
+    if (!currentDocument) return;
 
-                <DetailRow
-                  label="Subject"
-                  value={document.subject}
-                />
+    await documentService.deleteDocument(currentDocument.id);
 
-                <DetailRow
-                  label="Sender"
-                  value={document.sender}
-                />
+    navigation.goBack();
+  }
 
-                <DetailRow
-                  label="Receiver"
-                  value={document.receiver}
-                />
-
-                <DetailRow
-                  label="Department"
-                  value={document.department}
-                />
-
-                <DetailRow
-                  label="Priority"
-                  value={document.priority}
-                />
-
-                <DetailRow
-                  label="Remarks"
-                  value={document.remarks}
-                />
-
-                <DetailRow
-                  label="Date Received"
-                  value={document.dateReceived}
-                />
-
-                <AppText>
-                    {document.sender}
-                </AppText>
-
-                <AppText>
-                    {document.receiver}
-                </AppText>
-
-                <AppText>
-                    {document.department}
-                </AppText>
-
-                <AppText>
-                    {document.priority}
-                </AppText>
-
-                <AppText>
-                    {document.status}
-                </AppText>
-
-                <AppText>
-                    {document.remarks}
-                </AppText>
-
-                <AppButton
-                    title="Edit"
-                    onPress={() =>
-                        navigation.navigate(
-                            "EditDocument",
-                            {
-                                documentId: document.id,
-                            }
-                        )
-                    }
-                />
-
-        <AppButton
-          title="Delete Document"
-          onPress={confirmDelete}
-        />
-
-            </ScreenContainer>
-          </ScrollableScreen>
-        </SafeScreen>
+  function confirmDelete() {
+    Alert.alert(
+      "Delete Document",
+      "Are you sure you want to delete this document?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: handleDelete,
+        },
+      ]
     );
+  }
+
+ function getNextStatus(): DocumentStatus | null {
+  if (!document) return null;
+
+  if (document.documentType === "OUT") {
+    switch (document.status) {
+      case DocumentStatus.PENDING:
+        return DocumentStatus.RELEASED;
+
+      case DocumentStatus.RELEASED:
+        return DocumentStatus.COMPLETED;
+
+      default:
+        return null;
+    }
+  }
+
+  if (document.documentType === "IN") {
+    switch (document.status) {
+      case DocumentStatus.RECEIVED:
+        return DocumentStatus.COMPLETED;
+
+      default:
+        return null;
+    }
+  }
+
+  return null;
+}
+
+function getStatusButtonTitle() {
+  if (!document) return "";
+
+  if (document.documentType === "OUT") {
+    switch (document.status) {
+      case DocumentStatus.PENDING:
+        return "Release Document";
+
+      case DocumentStatus.RELEASED:
+        return "Complete Document";
+
+      default:
+        return "";
+    }
+  }
+
+  if (document.documentType === "IN") {
+    switch (document.status) {
+      case DocumentStatus.RECEIVED:
+        return "Complete Document";
+
+      default:
+        return "";
+    }
+  }
+
+  return "";
+}
+
+async function handleStatusUpdate() {
+  if (!document) return;
+
+  const nextStatus = getNextStatus();
+
+  if (!nextStatus) return;
+
+  const updated = await documentService.updateStatus(
+    document.id,
+    nextStatus
+  );
+
+  setDocument(updated);
+
+  await refresh();
+}
+
+  return (
+    <SafeScreen>
+      <ScrollableScreen>
+        <ScreenContainer>
+
+          <AppHeader title="Document Details" />
+
+          <AppText>
+            {document.trackingNumber}
+          </AppText>
+
+          <DetailRow
+            label="Document Type"
+            value={document.documentType}
+          />
+
+          <DetailRow
+            label="Document Title"
+            value={document.title}
+          />
+
+          <DetailRow
+            label="Subject"
+            value={document.subject}
+          />
+
+          {document.documentType === "IN" && (
+            <>
+              <DetailRow
+                label="Department From"
+                value={document.departmentFrom ?? ""}
+              />
+
+              <DetailRow
+                label="Received By"
+                value={document.receivedBy ?? ""}
+              />
+            </>
+          )}
+
+          {document.documentType === "OUT" && (
+            <>
+              <DetailRow
+                label="Destination"
+                value={document.destination ?? ""}
+              />
+
+              <DetailRow
+                label="Processed By"
+                value={document.processedBy ?? ""}
+              />
+            </>
+          )}
+
+          <DetailRow
+            label="Status"
+            value={document.status}
+          />
+
+          {getNextStatus() && (
+            <AppButton
+              title={getStatusButtonTitle()}
+              onPress={handleStatusUpdate}
+              disabled={updatingStatus}
+            />
+          )}
+
+          <DetailRow
+            label="Remarks"
+            value={document.remarks ?? ""}
+          />
+
+          <DetailRow
+            label="Document Date"
+            value={document.documentDate}
+          />
+          
+
+          <AppButton
+            title="Edit"
+            onPress={() =>
+              navigation.navigate("EditDocument", {
+                documentId: document.id,
+              })
+            }
+          />
+
+          <AppButton
+            title="Delete Document"
+            onPress={confirmDelete}
+          />
+          
+
+          <AppText
+            variant="heading"
+            style={{
+              marginTop: 24,
+              marginBottom: 12,
+            }}
+          >
+            History
+          </AppText>
+
+          <FlatList
+            data={history}
+            keyExtractor={(item) => item.id}
+            scrollEnabled={false}
+            renderItem={({ item }) => (
+              <HistoryItem history={item} />
+            )}
+          />
+
+        </ScreenContainer>
+      </ScrollableScreen>
+    </SafeScreen>
+  );
 }

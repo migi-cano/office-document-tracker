@@ -8,9 +8,10 @@ import { StatusSelectorProps } from "./StatusSelector.types";
 import { styles } from "./StatusSelector.styles";
 
 const statuses: DocumentStatus[] = [
-  "Received",
-  "Pending",
-  "Released",
+  DocumentStatus.RECEIVED,
+  DocumentStatus.PENDING,
+  DocumentStatus.RELEASED,
+  DocumentStatus.COMPLETED,
 ];
 
 export default function StatusSelector({

@@ -1,22 +1,20 @@
 import { View } from "react-native";
 import { Controller } from "react-hook-form";
-
-import {
-  AppButton,
-  AppInput,
-  AppText,
-} from "../../../../components/common";
-
+import {AppButton,AppInput,AppText,} from "../../../../components/common";
 import { useReceiveDocument } from "../../hooks/useReceiveDocument";
 import { DocumentFormProps } from "./DocumentForm.types";
-
 import { styles } from "./DocumentForm.styles";
 
+
 export default function DocumentForm({
+  documentType,
   initialValues,
   submitButtonTitle = "Save Document",
   onSubmit,
 }: DocumentFormProps) {
+
+  console.log("=== DOCUMENT FORM ===");
+console.log(initialValues);
   
   
   const {
@@ -31,6 +29,26 @@ export default function DocumentForm({
         value="Auto Generated"
         editable={false}
       />
+      <Controller
+        control={control}
+        name="title"
+        render={({ field, fieldState }) => (
+          <>
+            <AppInput
+              label="Document Title"
+              placeholder="Enter document title"
+              value={field.value}
+              onChangeText={field.onChange}
+            />
+
+      {fieldState.error && (
+        <AppText style={{ color: "red" }}>
+          {fieldState.error.message}
+        </AppText>
+      )}
+    </>
+  )}
+/>
 
       {/* Subject */}
       <Controller
@@ -54,71 +72,27 @@ export default function DocumentForm({
         )}
       />
 
-      {/* Sender */}
-      <Controller
-        control={control}
-        name="sender"
-        render={({ field, fieldState }) => (
-          <>
-            <AppInput
-              label="Sender"
-              placeholder="Enter sender"
-              value={field.value}
-              onChangeText={field.onChange}
-            />
-
-            {fieldState.error && (
-              <AppText style={{ color: "red" }}>
-                {fieldState.error.message}
-              </AppText>
-            )}
-          </>
-        )}
+      {/* Document Type */}
+<Controller
+  control={control}
+  name="documentType"
+  render={({ field, fieldState }) => (
+    <>
+      <AppInput
+        label="Document Type"
+        placeholder="Enter document type"
+        value={field.value}
+        onChangeText={field.onChange}
       />
 
-      {/* Receiver */}
-      <Controller
-        control={control}
-        name="receiver"
-        render={({ field, fieldState }) => (
-          <>
-            <AppInput
-              label="Receiver"
-              placeholder="Enter receiver"
-              value={field.value}
-              onChangeText={field.onChange}
-            />
-
-            {fieldState.error && (
-              <AppText style={{ color: "red" }}>
-                {fieldState.error.message}
-              </AppText>
-            )}
-          </>
-        )}
-      />
-
-      {/* Department */}
-      <Controller
-        control={control}
-        name="department"
-        render={({ field, fieldState }) => (
-          <>
-            <AppInput
-              label="Department"
-              placeholder="Enter department"
-              value={field.value}
-              onChangeText={field.onChange}
-            />
-
-            {fieldState.error && (
-              <AppText style={{ color: "red" }}>
-                {fieldState.error.message}
-              </AppText>
-            )}
-          </>
-        )}
-      />
+      {fieldState.error && (
+        <AppText style={{ color: "red" }}>
+          {fieldState.error.message}
+        </AppText>
+      )}
+    </>
+  )}
+/>
 
       {/* Remarks */}
       <Controller
@@ -135,6 +109,101 @@ export default function DocumentForm({
           />
         )}
       />
+
+
+      {documentType === "OUT" && (
+  <>
+    <Controller
+      control={control}
+      name="destination"
+      render={({ field, fieldState }) => (
+        <>
+          <AppInput
+            label="Destination"
+            placeholder="Enter destination"
+            value={field.value}
+            onChangeText={field.onChange}
+          />
+
+          {fieldState.error && (
+            <AppText style={{ color: "red" }}>
+              {fieldState.error.message}
+            </AppText>
+          )}
+        </>
+      )}
+    />
+
+     <Controller
+          control={control}
+          name="processedBy"
+          render={({ field, fieldState }) => (
+            <>
+              <AppInput
+                label="Processed By"
+                placeholder="Enter processor"
+                value={field.value}
+                onChangeText={field.onChange}
+              />
+
+              {fieldState.error && (
+                <AppText style={{ color: "red" }}>
+                  {fieldState.error.message}
+                </AppText>
+              )}
+            </>
+          )}
+        />
+      </>
+    )}
+
+    {documentType === "IN" && (
+  <>
+    <Controller
+      control={control}
+      name="departmentFrom"
+      render={({ field, fieldState }) => (
+        <>
+          <AppInput
+            label="Department From"
+            placeholder="Enter department"
+            value={field.value}
+            onChangeText={field.onChange}
+          />
+
+          {fieldState.error && (
+            <AppText style={{ color: "red" }}>
+              {fieldState.error.message}
+            </AppText>
+          )}
+        </>
+      )}
+    />
+
+    <Controller
+      control={control}
+      name="receivedBy"
+      render={({ field, fieldState }) => (
+        <>
+          <AppInput
+            label="Received By"
+            placeholder="Enter receiver"
+            value={field.value}
+            onChangeText={field.onChange}
+          />
+
+          {fieldState.error && (
+            <AppText style={{ color: "red" }}>
+              {fieldState.error.message}
+            </AppText>
+          )}
+        </>
+      )}
+    />
+  </>
+)}
+
+
 
       <AppButton
         title={submitButtonTitle}

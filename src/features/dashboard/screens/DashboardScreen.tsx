@@ -2,27 +2,32 @@ import AppButton from "../../../components/common/AppButton";
 import AppCard from "../../../components/common/AppCard";
 import AppText from "../../../components/common/AppText";
 
+
 import {
   AppHeader,
   SafeScreen,
   ScreenContainer,
+  ScrollableScreen,
 } from "../../../components/layout";
 
 import { useAuth } from "../../../providers/AuthProvider";
 import { useDashboard } from "../hooks/useDashboard";
 import { DashboardStatCard } from "../../../components/business";
+
 export default function DashboardScreen() {
   const { user, logout } = useAuth();
 
   const {
-    loading,
-    totalDocuments,
-    receivedDocuments,
-    pendingDocuments,
-    releasedDocuments,
-    highPriorityDocuments,
-    recentDocuments,
-  } = useDashboard();
+  loading,
+  totalDocuments,
+  receivedDocuments,
+  pendingDocuments,
+  releasedDocuments,
+  completedDocuments,
+  incomingDocuments,
+  outgoingDocuments,
+  recentDocuments,
+} = useDashboard();
 
   if (loading) {
     return (
@@ -36,6 +41,7 @@ export default function DashboardScreen() {
 
   return (
     <SafeScreen>
+      <ScrollableScreen>
       <ScreenContainer>
         <AppHeader
           title="Office Document Tracker"
@@ -68,26 +74,22 @@ export default function DashboardScreen() {
           />
 
           <DashboardStatCard
-              title="High Priority"
-              value={highPriorityDocuments}
-              icon="alert-circle"
-          />
+              title="Completed"
+              value={completedDocuments}
+              icon="checkmark-done"
+            />
 
-          <AppText>
-            Received Documents: {receivedDocuments}
-          </AppText>
+            <DashboardStatCard
+              title="Incoming"
+              value={incomingDocuments}
+              icon="download"
+            />
 
-          <AppText>
-            Pending Documents: {pendingDocuments}
-          </AppText>
-
-          <AppText>
-            Released Documents: {releasedDocuments}
-          </AppText>
-
-          <AppText>
-            High Priority: {highPriorityDocuments}
-          </AppText>
+            <DashboardStatCard
+              title="Outgoing"
+              value={outgoingDocuments}
+              icon="paper-plane"
+            />
         </AppCard>
 
         <AppCard>
@@ -105,6 +107,7 @@ export default function DashboardScreen() {
           onPress={logout}
         />
       </ScreenContainer>
+      </ScrollableScreen>
     </SafeScreen>
   );
 }

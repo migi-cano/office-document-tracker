@@ -1,4 +1,10 @@
-import { useNavigation } from "@react-navigation/native";
+import {
+  useNavigation,
+  useRoute,
+  RouteProp,
+} from "@react-navigation/native";
+
+import { DocumentsStackParamList } from "../../../navigation/navigation.types";
 
 import {
   AppHeader,
@@ -13,42 +19,71 @@ import { documentService } from "../services/document.service";
 import { generateTrackingNumber } from "../utils/generateTrackingNumber";
 
 import { ReceiveDocumentFormData } from "../validation/receiveDocument.schema";
+import { DocumentStatus } from "../types/document.types";
+import { parseOcr } from "../utils/parseOcr";
 
 
 
 export default function ReceiveDocumentScreen() {
   const navigation = useNavigation();
 
-  async function handleCreate(
+  type ReceiveDocumentRouteProp = RouteProp<
+  DocumentsStackParamList,
+  "ReceiveDocument"
+>;
+
+  const route = useRoute<ReceiveDocumentRouteProp>();
+
+
+
+  const ocrText = route.params?.ocrText ?? "";
+  console.log("=== RECEIVE SCREEN ===");
+console.log(route.params);
+  const imageUri = route.params?.imageUri ?? "";
+  const aiTitle = route.params?.title ?? "";
+const aiSubject = route.params?.subject ?? "";
+  const parsed = parseOcr(ocrText);
+  const aiDocumentType = route.params?.documentType ?? "";
+  console.log("=== PARSED ===");
+
+ async function handleCreate(
   data: ReceiveDocumentFormData
 ) {
-  console.log("handleCreate called");
-  console.log(data);
+  const now = new Date().toISOString();
 
-  const now = new Date();
-
-await documentService.addDocument({
-  id: Date.now().toString(),
+  await documentService.addDocument({
+  id: "",
 
   trackingNumber: generateTrackingNumber(),
 
-  subject: data.subject,
-  sender: data.sender,
-  receiver: data.receiver,
-  department: data.department,
+  documentType: "IN",
 
-  priority: "Normal",
-  status: "Received",
+  title: data.title,
+
+  subject: data.subject,
+
+  departmentFrom: data.departmentFrom,
+
+  destination: "",
+
+  processedBy: "",
+
+  receivedBy: data.receivedBy,
+
+  status: DocumentStatus.RECEIVED,
 
   remarks: data.remarks ?? "",
 
-  dateReceived: now.toISOString(),
+  documentDate: now,
 
-  createdAt: now.toISOString(),
-  updatedAt: now.toISOString(),
+  ocrText,
+
+  attachmentUrl: imageUri,
+
+  createdAt: now,
+
+  updatedAt: now,
 });
-
-    console.log("Document saved");
 
   navigation.goBack();
 }
@@ -61,11 +96,19 @@ await documentService.addDocument({
           title="Receive Document"
           subtitle="Create a new incoming document"
         />
+        
 
         <DocumentForm
-          submitButtonTitle="Save Document"
-          onSubmit={handleCreate}
-        />
+            documentType="IN"
+            initialValues={{
+            title: aiTitle || parsed.title,
+            subject: aiSubject || parsed.subject,
+            documentType: aiDocumentType,
+        }}
+            submitButtonTitle="Save Incoming Document"
+            onSubmit={handleCreate}
+          />
+
       </ScreenContainer>
       </ScrollableScreen>
     </SafeScreen>

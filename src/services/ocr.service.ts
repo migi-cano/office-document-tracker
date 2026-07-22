@@ -1,0 +1,57 @@
+import * as FileSystem from "expo-file-system/legacy";
+import { documentParser } from "../features/scanner/services/documentParser.service";
+import { ExtractedDocument } from "../features/scanner/types/ocr.types";
+
+class OCRService {
+  async extractDocument(
+    imageUri: string
+  ): Promise<ExtractedDocument> {
+    const apiKey = process.env.EXPO_PUBLIC_OCR_SPACE_API_KEY;
+    console.log(process.env.EXPO_PUBLIC_OCR_SPACE_API_KEY);
+
+    if (!apiKey) {
+      throw new Error("OCR.Space API key is missing.");
+    }
+
+    const base64 = await FileSystem.readAsStringAsync(imageUri, {
+      encoding: FileSystem.EncodingType.Base64,
+    });
+
+    const formData = new FormData();
+
+    formData.append(
+      "base64Image",
+      `data:image/jpeg;base64,${base64}`
+    );
+    formData.append("language", "eng");
+    formData.append("isOverlayRequired", "false");
+    formData.append("OCREngine", "2");
+
+    const response = await fetch(
+      "https://api.ocr.space/parse/image",
+      {
+        method: "POST",
+        headers: {
+          apikey: apiKey,
+        },
+        body: formData,
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("OCR request failed.");
+    }
+
+    const json = await response.json();
+
+    const fullText =
+      json?.ParsedResults?.[0]?.ParsedText ?? "";
+
+    return documentParser.parse(
+  imageUri,
+  fullText
+);
+  }
+}
+
+export const ocrService = new OCRService();

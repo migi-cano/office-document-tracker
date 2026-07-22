@@ -1,9 +1,20 @@
 import { StyleSheet } from "react-native";
 
+import {
+  Colors,
+  Radius,
+  Shadows,
+  Spacing,
+} from "../../../theme";
+
 export const styles = StyleSheet.create({
-  value: {
-    fontSize: 32,
-    fontWeight: "700",
-    marginTop: 8,
-  },
+  container: {
+  backgroundColor: Colors.surface,
+  borderRadius: Radius.lg,
+  padding: Spacing.lg,
+  alignItems: "center",
+  justifyContent: "center",
+  minHeight: 110,
+  ...Shadows.sm,
+}
 });
