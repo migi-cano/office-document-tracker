@@ -8,6 +8,13 @@ export enum DocumentStatus {
   COMPLETED = "COMPLETED",
 }
 
+export type DocumentFilter =
+  | "ALL"
+  | "IN"
+  | "OUT"
+  | "PENDING"
+  | "COMPLETED";
+
 export interface Document {
   id: string;
 
