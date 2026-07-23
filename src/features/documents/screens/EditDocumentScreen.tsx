@@ -98,7 +98,7 @@ await documentService.updateDocument(document.id, {
         />
 
         <DocumentForm
-          documentType={document.documentType}
+          direction={document.direction}
           initialValues={{
           title: document.title,
           subject: document.subject,

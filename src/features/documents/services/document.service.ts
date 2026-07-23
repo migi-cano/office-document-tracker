@@ -1,7 +1,6 @@
 import {
   Document,
   DocumentStatus,
-  DocumentType,
 } from "../types/document.types";
 import { supabase } from "../../../lib/supabase";
 import { documentHistoryService, DocumentHistoryAction } from "../history";
@@ -11,7 +10,9 @@ const toDocument = (row: any): Document => ({
 
   trackingNumber: row.tracking_number,
 
-  documentType: row.document_type as DocumentType,
+  direction: row.direction,
+
+  documentType: row.document_type,
 
   title: row.title,
 
@@ -42,6 +43,8 @@ const toDocument = (row: any): Document => ({
 
  const toDatabase = (document: Partial<Document>) => ({
   tracking_number: document.trackingNumber,
+
+  direction: document.direction,
 
   document_type: document.documentType,
 
@@ -115,7 +118,7 @@ const { data, error } = await query;
       oldStatus: undefined,
       newStatus: undefined,
       department:
-        created.documentType === "IN"
+        created.direction === "IN"
         ? created.departmentFrom
         : created.destination,
       remarks: "Document created.",
@@ -175,7 +178,7 @@ const { data, error } = await query;
     oldStatus: undefined,
     newStatus: undefined,
     department:
-      updated.documentType === "IN"
+      updated.direction === "IN"
         ? updated.departmentFrom
         : updated.destination,
     remarks: "Document details updated.",
@@ -201,7 +204,7 @@ const { data, error } = await query;
     oldStatus: undefined,
     newStatus: undefined,
     department:
-      current.documentType === "IN"
+       current.direction === "IN"
         ? current.departmentFrom
         : current.destination,
     remarks: "Document deleted.",

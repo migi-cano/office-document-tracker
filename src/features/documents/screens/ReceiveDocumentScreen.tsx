@@ -21,29 +21,40 @@ import { generateTrackingNumber } from "../utils/generateTrackingNumber";
 import { ReceiveDocumentFormData } from "../validation/receiveDocument.schema";
 import { DocumentStatus } from "../types/document.types";
 import { parseOcr } from "../utils/parseOcr";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 
 
 export default function ReceiveDocumentScreen() {
-  const navigation = useNavigation();
+  const navigation =
+  useNavigation<ReceiveDocumentNavigationProp>();
 
-  type ReceiveDocumentRouteProp = RouteProp<
-  DocumentsStackParamList,
-  "ReceiveDocument"
->;
+  const route =
+  useRoute<ReceiveDocumentRouteProp>();
 
-  const route = useRoute<ReceiveDocumentRouteProp>();
+  type ReceiveDocumentNavigationProp =
+  NativeStackNavigationProp<
+    DocumentsStackParamList,
+    "ReceiveDocument"
+  >;
 
+type ReceiveDocumentRouteProp =
+  RouteProp<
+    DocumentsStackParamList,
+    "ReceiveDocument"
+  >;
 
+  const { analysis } = route.params;
+
+  const {
+  title: aiTitle,
+  subject: aiSubject,
+  documentType: aiDocumentType,
+} = analysis;
 
   const ocrText = route.params?.ocrText ?? "";
-  console.log("=== RECEIVE SCREEN ===");
-console.log(route.params);
   const imageUri = route.params?.imageUri ?? "";
-  const aiTitle = route.params?.title ?? "";
-const aiSubject = route.params?.subject ?? "";
   const parsed = parseOcr(ocrText);
-  const aiDocumentType = route.params?.documentType ?? "";
   console.log("=== PARSED ===");
 
  async function handleCreate(
@@ -56,10 +67,11 @@ const aiSubject = route.params?.subject ?? "";
 
   trackingNumber: generateTrackingNumber(),
 
-  documentType: "IN",
+  direction: "IN",
+
+  documentType: data.documentType,
 
   title: data.title,
-
   subject: data.subject,
 
   departmentFrom: data.departmentFrom,
@@ -84,8 +96,9 @@ const aiSubject = route.params?.subject ?? "";
 
   updatedAt: now,
 });
+ navigation.popToTop();
+ 
 
-  navigation.goBack();
 }
 
   return (
@@ -99,7 +112,7 @@ const aiSubject = route.params?.subject ?? "";
         
 
         <DocumentForm
-            documentType="IN"
+            direction="IN"
             initialValues={{
             title: aiTitle || parsed.title,
             subject: aiSubject || parsed.subject,

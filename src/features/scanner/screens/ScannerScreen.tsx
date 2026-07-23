@@ -18,7 +18,8 @@ import { useNavigation } from "@react-navigation/native";
 import type { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
 
 import { MainTabParamList } from "../../../navigation/navigation.types";
-import { documentAIService } from "../../../services/documentAi.service";
+import { documentAIService } from "../../../types/documentAi.service";
+import { AiDocumentAnalysis } from "../../documents/types";
 
 type ScannerNavigationProp = BottomTabNavigationProp<
   MainTabParamList,
@@ -95,23 +96,36 @@ const handleContinue = async () => {
     console.log(ocr.fullText);
 
     // Gemini
-    const ai = await documentAIService.extractDocument(
-      ocr.fullText
-    );
+   let analysis: AiDocumentAnalysis;
 
-    console.log("Gemini:");
-    console.log(ai);
+        try {
+          analysis = await documentAIService.extractDocument(
+            ocr.fullText
+          );
+        } catch (error) {
+          console.warn("Gemini extraction failed:", error);
 
-    navigation.navigate("Documents", {
-  screen: "ReceiveDocument",
-  params: {
-    imageUri: photoUri,
-    ocrText: ocr.fullText,
-    title: ai.title,
-    subject: ai.subject,
-    documentType: ai.documentType,
-  },
-});
+          Alert.alert(
+            "AI Unavailable",
+            "The document was scanned successfully, but AI extraction is currently unavailable. You can continue and fill in the information manually."
+          );
+
+          analysis = {
+            documentType: "",
+            title: "",
+            subject: "",
+          };
+        }
+
+        navigation.navigate("Documents", {
+          screen: "DocumentPreview",
+          params: {
+            imageUri: photoUri,
+            ocrText: ocr.fullText,
+            analysis,
+          },
+        });
+
   } catch (error) {
     console.error(error);
 

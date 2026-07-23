@@ -1,4 +1,5 @@
 import { NavigatorScreenParams } from "@react-navigation/native";
+import { AiDocumentAnalysis } from "../features/documents/types";
 
 export type RootStackParamList = {
   Auth: undefined;
@@ -8,17 +9,25 @@ export type RootStackParamList = {
 export type DocumentsStackParamList = {
   DocumentsList: undefined;
 
+ DocumentPreview: {
+    imageUri: string;
+    ocrText: string;
+    analysis: AiDocumentAnalysis;
+  };
+
  ReceiveDocument: {
-    imageUri?: string;
-    ocrText?: string;
-    title?: string;
-    subject?: string;
-    documentType?: string;
-};
+    imageUri: string;
+    ocrText: string;
+    analysis: AiDocumentAnalysis;
+}
 
-  OutgoingDocument: undefined;
+ OutgoingDocument: {
+    analysis: AiDocumentAnalysis;
+    ocrText: string;
+    imageUri: string;
+  };
 
-  DocumentDetails: {
+ DocumentDetails: {
     documentId: string;
   };
 

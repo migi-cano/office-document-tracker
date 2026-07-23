@@ -1,8 +1,8 @@
-import { DocumentType } from "../../types/document.types";
+import { DocumentDirection } from "../../types/document.types";
 import { ReceiveDocumentFormData } from "../../validation/receiveDocument.schema";
 
 export interface DocumentFormProps {
-  documentType: DocumentType;
+  direction: DocumentDirection;
 
   initialValues?: Partial<ReceiveDocumentFormData>;
 

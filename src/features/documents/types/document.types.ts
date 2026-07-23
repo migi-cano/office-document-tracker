@@ -1,4 +1,4 @@
-export type DocumentType = "IN" | "OUT";
+export type DocumentDirection = "IN" | "OUT";
 
 
 export enum DocumentStatus {
@@ -20,7 +20,9 @@ export interface Document {
 
   trackingNumber: string;
 
-  documentType: DocumentType;
+  direction: DocumentDirection;
+
+  documentType: string;
 
   title: string;
 

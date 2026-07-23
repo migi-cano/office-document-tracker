@@ -111,7 +111,7 @@ export default function DocumentDetailsScreen() {
  function getNextStatus(): DocumentStatus | null {
   if (!document) return null;
 
-  if (document.documentType === "OUT") {
+  if (document.direction === "OUT") {
     switch (document.status) {
       case DocumentStatus.PENDING:
         return DocumentStatus.RELEASED;
@@ -124,7 +124,7 @@ export default function DocumentDetailsScreen() {
     }
   }
 
-  if (document.documentType === "IN") {
+  if (document.direction === "IN") {
     switch (document.status) {
       case DocumentStatus.RECEIVED:
         return DocumentStatus.COMPLETED;
@@ -140,7 +140,7 @@ export default function DocumentDetailsScreen() {
 function getStatusButtonTitle() {
   if (!document) return "";
 
-  if (document.documentType === "OUT") {
+  if (document.direction === "OUT") {
     switch (document.status) {
       case DocumentStatus.PENDING:
         return "Release Document";
@@ -153,7 +153,7 @@ function getStatusButtonTitle() {
     }
   }
 
-  if (document.documentType === "IN") {
+  if (document.direction === "IN") {
     switch (document.status) {
       case DocumentStatus.RECEIVED:
         return "Complete Document";
@@ -196,7 +196,7 @@ async function handleStatusUpdate() {
 
           <DetailRow
             label="Document Type"
-            value={document.documentType}
+            value={document.direction}
           />
 
           <DetailRow
@@ -209,7 +209,7 @@ async function handleStatusUpdate() {
             value={document.subject}
           />
 
-          {document.documentType === "IN" && (
+          {document.direction === "IN" && (
             <>
               <DetailRow
                 label="Department From"
@@ -223,7 +223,7 @@ async function handleStatusUpdate() {
             </>
           )}
 
-          {document.documentType === "OUT" && (
+          {document.direction === "OUT" && (
             <>
               <DetailRow
                 label="Destination"

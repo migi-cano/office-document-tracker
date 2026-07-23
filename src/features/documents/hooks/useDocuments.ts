@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { useFocusEffect } from "@react-navigation/native";
 
 import { documentService } from "../services/document.service";
 import { Document } from "../types/document.types";
@@ -7,7 +8,7 @@ export function useDocuments(search: string) {
   const [documents, setDocuments] = useState<Document[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const loadDocuments = async () => {
+  const loadDocuments = useCallback(async () => {
     setLoading(true);
 
     try {
@@ -16,11 +17,17 @@ export function useDocuments(search: string) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [search]);
 
   useEffect(() => {
     loadDocuments();
-  }, [search]);
+  }, [loadDocuments]);
+
+  useFocusEffect(
+    useCallback(() => {
+      loadDocuments();
+    }, [loadDocuments])
+  );
 
   return {
     documents,

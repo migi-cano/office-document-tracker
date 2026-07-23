@@ -1,4 +1,10 @@
-import { useNavigation } from "@react-navigation/native";
+import {
+  useNavigation,
+  useRoute,
+  RouteProp,
+} from "@react-navigation/native";
+
+import { DocumentsStackParamList } from "../../../navigation/navigation.types";
 
 import {
   AppHeader,
@@ -13,70 +19,111 @@ import { documentService } from "../services/document.service";
 import { generateTrackingNumber } from "../utils/generateTrackingNumber";
 
 import { ReceiveDocumentFormData } from "../validation/receiveDocument.schema";
+import { DocumentStatus } from "../types/document.types";
+import { parseOcr } from "../utils/parseOcr";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
-import {
-  DocumentStatus,
-} from "../types/document.types";
 
-export default function OutgoingDocumentScreen() {
-  const navigation = useNavigation();
 
-  async function handleCreate(
-    data: ReceiveDocumentFormData
-  ) {
-    const now = new Date().toISOString();
+export default function ReceiveDocumentScreen() {
+  type OutgoingDocumentNavigationProp =
+  NativeStackNavigationProp<
+    DocumentsStackParamList,
+    "OutgoingDocument"
+  >;
 
-    await documentService.addDocument({
-            id: "",
+type OutgoingDocumentRouteProp =
+  RouteProp<
+    DocumentsStackParamList,
+    "OutgoingDocument"
+  >;
 
-            trackingNumber: generateTrackingNumber(),
+const navigation =
+  useNavigation<OutgoingDocumentNavigationProp>();
 
-            documentType: "OUT",
+const route =
+  useRoute<OutgoingDocumentRouteProp>();
 
-            title: data.title,
+  const { analysis } = route.params;
+  
+  const {
+  title: aiTitle,
+  subject: aiSubject,
+  documentType: aiDocumentType,
+} = analysis;
 
-            subject: data.subject,
+  const ocrText = route.params?.ocrText ?? "";
+  const imageUri = route.params?.imageUri ?? "";
+  const parsed = parseOcr(ocrText);
+  console.log("=== PARSED ===");
 
-            destination: data.destination,
+ async function handleCreate(
+  data: ReceiveDocumentFormData
+) {
+  const now = new Date().toISOString();
 
-            departmentFrom: "",
+  await documentService.addDocument({
+  id: "",
 
-            processedBy: data.processedBy,
+  trackingNumber: generateTrackingNumber(),
 
-            receivedBy: "",
+  direction: "OUT",
 
-            status: DocumentStatus.PENDING,
+  documentType: data.documentType,
 
-            remarks: data.remarks ?? "",
+  title: data.title,
 
-            documentDate: now,
+  subject: data.subject,
 
-            ocrText: "",
+  departmentFrom: "",
 
-            attachmentUrl: "",
+  destination: data.destination,
 
-            createdAt: now,
+  processedBy: data.processedBy,
 
-            updatedAt: now,
-            });
-    navigation.goBack();
-  }
+  receivedBy: "",
+
+  status: DocumentStatus.PENDING,
+
+  remarks: data.remarks ?? "",
+
+  documentDate: now,
+
+  ocrText,
+
+  attachmentUrl: imageUri,
+
+  createdAt: now,
+
+  updatedAt: now,
+});
+
+  navigation.popToTop();
+}
 
   return (
     <SafeScreen>
       <ScrollableScreen>
-        <ScreenContainer>
-          <AppHeader
-            title="Outgoing Document"
-            subtitle="Create a new outgoing document"
-          />
+      <ScreenContainer>
 
-          <DocumentForm
-            documentType="OUT"
+
+        <AppHeader
+          title="Outgoing Document"
+          subtitle="Create a new outgoing document"
+        />
+      
+        <DocumentForm
+            direction="OUT"
+            initialValues={{
+            title: aiTitle || parsed.title,
+            subject: aiSubject || parsed.subject,
+            documentType: aiDocumentType,
+        }}
             submitButtonTitle="Save Outgoing Document"
             onSubmit={handleCreate}
-            />
-        </ScreenContainer>
+          />
+
+      </ScreenContainer>
       </ScrollableScreen>
     </SafeScreen>
   );
