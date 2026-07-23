@@ -22,6 +22,8 @@ import { ReceiveDocumentFormData } from "../validation/receiveDocument.schema";
 import { DocumentStatus } from "../types/document.types";
 import { parseOcr } from "../utils/parseOcr";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { storageService } from "../services/storage.service";
+import { Alert } from "react-native";
 
 
 
@@ -57,48 +59,66 @@ const route =
   const parsed = parseOcr(ocrText);
   console.log("=== PARSED ===");
 
- async function handleCreate(
+
+async function handleCreate(
   data: ReceiveDocumentFormData
 ) {
-  const now = new Date().toISOString();
+  try {
+    const now = new Date().toISOString();
 
-  await documentService.addDocument({
-  id: "",
+    let imagePath: string | undefined;
 
-  trackingNumber: generateTrackingNumber(),
+    if (imageUri) {
+      imagePath = await storageService.uploadImage(imageUri);
+    }
 
-  direction: "OUT",
+    await documentService.addDocument({
+      id: "",
 
-  documentType: data.documentType,
+      trackingNumber: generateTrackingNumber(),
 
-  title: data.title,
+      direction: "OUT",
 
-  subject: data.subject,
+      documentType: data.documentType,
 
-  departmentFrom: "",
+      title: data.title,
 
-  destination: data.destination,
+      subject: data.subject,
 
-  processedBy: data.processedBy,
+      departmentFrom: "",
 
-  receivedBy: "",
+      destination: data.destination,
 
-  status: DocumentStatus.PENDING,
+      processedBy: data.processedBy,
 
-  remarks: data.remarks ?? "",
+      receivedBy: "",
 
-  documentDate: now,
+      status: DocumentStatus.PENDING,
 
-  ocrText,
+      remarks: data.remarks ?? "",
 
-  attachmentUrl: imageUri,
+      documentDate: now,
 
-  createdAt: now,
+      ocrText,
 
-  updatedAt: now,
-});
+      attachmentUrl: imageUri,
 
-  navigation.popToTop();
+      createdAt: now,
+
+      updatedAt: now,
+
+      imagePath,
+    });
+
+    navigation.popToTop();
+  } catch (error) {
+  console.error("Upload Error:", error);
+
+  Alert.alert(
+    "Upload Failed",
+    error instanceof Error ? error.message : JSON.stringify(error)
+  );
+}
 }
 
   return (

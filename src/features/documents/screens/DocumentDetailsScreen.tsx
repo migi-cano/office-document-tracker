@@ -1,4 +1,7 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { Alert, FlatList, Image } from "react-native";
+
+import { storageService } from "../services/storage.service";
 import {
   RouteProp,
   useRoute,
@@ -6,7 +9,6 @@ import {
   useNavigation,
 } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { Alert, FlatList } from "react-native";
 
 import {
   AppHeader,
@@ -53,6 +55,7 @@ export default function DocumentDetailsScreen() {
 
   const [document, setDocument] =
     useState<Document>();
+  const [imageUrl, setImageUrl] = useState<string>();
 
   const {
     history,
@@ -75,6 +78,27 @@ export default function DocumentDetailsScreen() {
       load();
     }, [route.params.documentId, refresh])
   );
+
+  useEffect(() => {
+      async function loadImage() {
+        if (!document?.imagePath) {
+          setImageUrl(undefined);
+          return;
+        }
+
+        try {
+          const url = await storageService.getSignedUrl(
+            document.imagePath
+          );
+
+          setImageUrl(url);
+        } catch (error) {
+          console.error("Failed to load image:", error);
+        }
+      }
+
+      loadImage();
+    }, [document?.imagePath]);
 
   if (!document) {
     return null;
@@ -208,6 +232,19 @@ async function handleStatusUpdate() {
             label="Subject"
             value={document.subject}
           />
+
+          {imageUrl && (
+          <Image
+            source={{ uri: imageUrl }}
+            resizeMode="contain"
+            style={{
+              width: "100%",
+              height: 250,
+              borderRadius: 12,
+              marginVertical: 16,
+            }}
+          />
+        )}
 
           {document.direction === "IN" && (
             <>

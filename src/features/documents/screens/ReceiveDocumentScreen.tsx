@@ -22,6 +22,8 @@ import { ReceiveDocumentFormData } from "../validation/receiveDocument.schema";
 import { DocumentStatus } from "../types/document.types";
 import { parseOcr } from "../utils/parseOcr";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { storageService } from "../services/storage.service";
+import { Alert } from "react-native";
 
 
 
@@ -60,45 +62,62 @@ type ReceiveDocumentRouteProp =
  async function handleCreate(
   data: ReceiveDocumentFormData
 ) {
-  const now = new Date().toISOString();
+  try {
+    const now = new Date().toISOString();
 
-  await documentService.addDocument({
-  id: "",
+    let imagePath: string | undefined;
 
-  trackingNumber: generateTrackingNumber(),
+    if (imageUri) {
+      imagePath = await storageService.uploadImage(imageUri);
+    }
 
-  direction: "IN",
+    await documentService.addDocument({
+      id: "",
 
-  documentType: data.documentType,
+      trackingNumber: generateTrackingNumber(),
 
-  title: data.title,
-  subject: data.subject,
+      direction: "IN",
 
-  departmentFrom: data.departmentFrom,
+      documentType: data.documentType,
 
-  destination: "",
+      title: data.title,
 
-  processedBy: "",
+      subject: data.subject,
 
-  receivedBy: data.receivedBy,
+      departmentFrom: data.departmentFrom,
 
-  status: DocumentStatus.RECEIVED,
+      destination: "",
 
-  remarks: data.remarks ?? "",
+      processedBy: "",
 
-  documentDate: now,
+      receivedBy: data.receivedBy,
 
-  ocrText,
+      status: DocumentStatus.RECEIVED,
 
-  attachmentUrl: imageUri,
+      remarks: data.remarks ?? "",
 
-  createdAt: now,
+      documentDate: now,
 
-  updatedAt: now,
-});
- navigation.popToTop();
- 
+      ocrText,
 
+      attachmentUrl: imageUri,
+
+      createdAt: now,
+
+      updatedAt: now,
+
+      imagePath,
+    });
+
+    navigation.popToTop();
+  } catch (error) {
+  console.error("Upload Error:", error);
+
+  Alert.alert(
+    "Upload Failed",
+    error instanceof Error ? error.message : JSON.stringify(error)
+  );
+}
 }
 
   return (

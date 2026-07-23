@@ -18,6 +18,8 @@ const toDocument = (row: any): Document => ({
 
   subject: row.subject,
 
+  imagePath: row.image_path,
+
   destination: row.destination,
 
   departmentFrom: row.department_from,
@@ -51,6 +53,8 @@ const toDocument = (row: any): Document => ({
   title: document.title,
 
   subject: document.subject,
+  
+  image_path: document.imagePath,
 
   destination: document.destination,
 
@@ -69,6 +73,7 @@ const toDocument = (row: any): Document => ({
   ocr_text: document.ocrText,
 
   attachment_url: document.attachmentUrl,
+
 });
 
 class DocumentService {
