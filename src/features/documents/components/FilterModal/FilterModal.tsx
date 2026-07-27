@@ -112,6 +112,24 @@ export default function FilterModal({
           <Pressable
             style={styles.option}
             onPress={() => {
+              onSelect("RELEASED");
+              onClose();
+            }}
+          >
+            <Text style={styles.label}>Release</Text>
+
+            {selectedFilter === "RELEASED" && (
+              <Ionicons
+                name="checkmark"
+                size={22}
+                color="#2563EB"
+              />
+            )}
+          </Pressable>
+
+          <Pressable
+            style={styles.option}
+            onPress={() => {
               onSelect("COMPLETED");
               onClose();
             }}

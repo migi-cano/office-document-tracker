@@ -25,4 +25,9 @@ export const Colors = {
   // Neutrals
   white: "#FFFFFF",
   black: "#000000",
+
+  received: "#2563EB", 
+  pending: "#F59E0B", 
+  released: "#7C3AED",   
+  completed: "#16A34A",  
 };

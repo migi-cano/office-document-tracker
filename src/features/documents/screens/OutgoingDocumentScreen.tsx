@@ -110,7 +110,7 @@ async function handleCreate(
       imagePath,
     });
 
-    navigation.popToTop();
+    navigation.navigate("DocumentsList", {});
   } catch (error) {
   console.error("Upload Error:", error);
 

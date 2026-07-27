@@ -6,7 +6,7 @@ class DocumentAIService {
   ocrText: string
 ): Promise<AiDocumentAnalysis> {
     const response = await fetch(
-      "http://192.168.102.70:3000/api/ai/extract",
+      "http://192.168.103.102:3000/api/ai/extract",
       {
         method: "POST",
         headers: {

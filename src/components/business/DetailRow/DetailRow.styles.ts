@@ -7,17 +7,20 @@ import {
 
 export const styles = StyleSheet.create({
   container: {
-    paddingVertical: Spacing.md,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.border,
-  },
+  paddingVertical: Spacing.md,
+  borderBottomWidth: 1,
+  borderBottomColor: Colors.border,
+},
 
   label: {
-    color: Colors.textSecondary,
-    marginBottom: Spacing.xs,
-  },
+  color: Colors.textSecondary,
+  marginBottom: Spacing.xs,
+  textTransform: "uppercase",
+  letterSpacing: 0.5,
+},
 
   value: {
-    color: Colors.textPrimary,
-  },
+  color: Colors.textPrimary,
+  lineHeight: 22,
+},
 });

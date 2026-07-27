@@ -14,12 +14,15 @@ import { useScanner } from "../hooks/useScanner";
 import { useCameraCapture } from "../hooks/useCameraCapture";
 import { ocrService } from "../../../services/ocr.service";
 
-import { useNavigation } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import type { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
 
 import { MainTabParamList } from "../../../navigation/navigation.types";
 import { documentAIService } from "../../../types/documentAi.service";
 import { AiDocumentAnalysis } from "../../documents/types";
+import { useIsFocused } from "@react-navigation/native";
+
+
 
 type ScannerNavigationProp = BottomTabNavigationProp<
   MainTabParamList,
@@ -29,6 +32,7 @@ type ScannerNavigationProp = BottomTabNavigationProp<
 export default function ScannerScreen() {
   const navigation = useNavigation<ScannerNavigationProp>();
   const { permission } = useScanner();
+  const isFocused = useIsFocused();
   
 
   const {
@@ -56,31 +60,6 @@ export default function ScannerScreen() {
     );
   }
 
-  const handleTestOCR = async () => {
-  if (!photoUri) {
-    Alert.alert("No image", "Please capture a document first.");
-    return;
-  }
-
-  try {
-    const result = await ocrService.extractDocument(photoUri);
-
-    console.log("===== OCR RESULT =====");
-    console.log(result);
-    console.log(result.fullText);
-
-    Alert.alert(
-      "OCR Success",
-      result.fullText || "No text detected."
-    );
-  } catch (error) {
-    console.error(error);
-    Alert.alert(
-      "OCR Failed",
-      error instanceof Error ? error.message : "Unknown error"
-    );
-  }
-};
 
 const handleContinue = async () => {
   if (!photoUri) {
@@ -126,6 +105,8 @@ const handleContinue = async () => {
           },
         });
 
+        retakePhoto();
+
   } catch (error) {
     console.error(error);
 
@@ -164,24 +145,21 @@ const handleContinue = async () => {
     />
 
     <AppButton
-      title="Test OCR"
-      onPress={handleTestOCR}
-    />
-
-    <AppButton
       title="Continue"
       onPress={handleContinue}
     />
   </View>
 ) : (
         <View style={{ flex: 1 }}>
-          <CameraView
-            ref={cameraRef}
-            style={{
-              flex: 1,
-              borderRadius: 12,
-            }}
-          />
+          {isFocused ? (
+            <CameraView
+              ref={cameraRef}
+              style={{
+                flex: 1,
+                borderRadius: 12,
+              }}
+            />
+          ) : null}
 
           <AppButton
             title="Capture"

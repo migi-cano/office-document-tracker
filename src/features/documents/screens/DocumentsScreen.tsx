@@ -4,7 +4,6 @@ import {
   StyleSheet,
 } from "react-native";
 import { useMemo, useState } from "react";
-import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { EmptyState } from "../../../components/common";
 import {
@@ -16,7 +15,7 @@ import {
   DocumentCard,
   SearchBar,
 } from "../../../components/business";
-
+import { RouteProp } from "@react-navigation/native";
 import {
   AppHeader,
   SafeScreen,
@@ -28,8 +27,13 @@ import { useDebounce } from "../../../hooks/useDebounce";
 
 import { DocumentsStackParamList } from "../../../navigation/navigation.types";
 import { DocumentStatus } from "../types/document.types";
-
+import { useNavigation, useRoute } from "@react-navigation/native";
 import { DocumentFilter } from "../types/document-filter.types";
+
+type DocumentsRouteProps = RouteProp<
+  DocumentsStackParamList,
+  "DocumentsList"
+>;
 
 type DocumentsNavigationProp =
   NativeStackNavigationProp<DocumentsStackParamList>;
@@ -41,8 +45,11 @@ export default function DocumentsScreen() {
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounce(search);
 
-  const [filter, setFilter] =
-    useState<DocumentFilter>("ALL");
+const route = useRoute<DocumentsRouteProps>();
+
+const [filter, setFilter] = useState<DocumentFilter>(
+  route.params?.filter ?? "ALL"
+);
 
     const [filterVisible, setFilterVisible] =
   useState(false);
@@ -59,13 +66,16 @@ export default function DocumentsScreen() {
     return documents.filter((document) => {
       switch (filter) {
         case "IN":
-          return document.documentType === "IN";
+          return document.direction === "IN"
 
         case "OUT":
-          return document.documentType === "OUT";
+          return document.direction === "OUT"
 
         case "PENDING":
           return document.status === DocumentStatus.PENDING;
+
+        case "RELEASED":
+          return document.status === DocumentStatus.RELEASED;
 
         case "COMPLETED":
           return document.status === DocumentStatus.COMPLETED;
@@ -81,6 +91,7 @@ export default function DocumentsScreen() {
     IN: "Incoming Documents",
     OUT: "Outgoing Documents",
     PENDING: "Pending Documents",
+    RELEASED: "Released Documents",
     COMPLETED: "Completed Documents",
   }[filter];
 

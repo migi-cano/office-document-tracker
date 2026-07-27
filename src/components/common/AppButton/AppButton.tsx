@@ -13,19 +13,18 @@ export default function AppButton({
   title,
   variant = "primary",
   loading = false,
-  style,
   disabled,
   ...props
 }: AppButtonProps) {
   return (
     <TouchableOpacity
+      activeOpacity={0.8}
       {...props}
       disabled={disabled || loading}
       style={[
   styles.button,
   styles[variant],
   (disabled || loading) && styles.disabled,
-  style,
 ]}
     >
       {loading ? (
@@ -33,10 +32,10 @@ export default function AppButton({
       ) : (
         <AppText
           color={
-            variant === "outline"
-              ? Colors.primary
-              : Colors.white
-          }
+                  variant === "outline"
+                    ? Colors.primary
+                    : Colors.white
+                }
         >
           {title}
         </AppText>

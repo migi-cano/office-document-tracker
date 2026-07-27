@@ -3,4 +3,5 @@ export type DocumentFilter =
   | "IN"
   | "OUT"
   | "PENDING"
+  | "RELEASED"
   | "COMPLETED";

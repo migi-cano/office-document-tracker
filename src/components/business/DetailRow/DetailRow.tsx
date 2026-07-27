@@ -11,12 +11,18 @@ export default function DetailRow({
 }: DetailRowProps) {
   return (
     <View style={styles.container}>
-      <AppText variant="caption" style={styles.label}>
+      <AppText
+        variant="caption"
+        style={styles.label}
+      >
         {label}
       </AppText>
 
-      <AppText variant="body">
-        {value}
+      <AppText
+        variant="body"
+        style={styles.value}
+      >
+        {value || "-"}
       </AppText>
     </View>
   );

@@ -1,21 +1,22 @@
 import { StyleSheet } from "react-native";
-
-import {
-  Colors,
-  Radius,
-  Spacing,
-} from "../../../theme";
+import { Spacing } from "../../../theme";
 
 export const styles = StyleSheet.create({
   badge: {
-    alignSelf: "flex-start",
-    paddingHorizontal: Spacing.md,
-    paddingVertical: Spacing.xs,
-    borderRadius: Radius.full,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+
+    gap: Spacing.xs,
+
+    paddingHorizontal: Spacing.sm,
+    paddingVertical: 6,
+
+    borderRadius: 999,
   },
 
   text: {
-    color: Colors.white,
+    fontSize: 12,
     fontWeight: "600",
   },
 });
