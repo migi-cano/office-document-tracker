@@ -16,8 +16,21 @@ const statuses: DocumentStatus[] = [
 
 export default function StatusSelector({
   value,
+  direction,
   onChange,
 }: StatusSelectorProps) {
+  const statuses =
+    direction === "IN"
+      ? [
+          DocumentStatus.RECEIVED,
+          DocumentStatus.COMPLETED,
+        ]
+      : [
+          DocumentStatus.PENDING,
+          DocumentStatus.RELEASED,
+          DocumentStatus.COMPLETED,
+        ];
+
   return (
     <View style={styles.container}>
       {statuses.map((status) => (

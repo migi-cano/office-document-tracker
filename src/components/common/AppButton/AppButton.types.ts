@@ -4,14 +4,16 @@ import {
   ViewStyle,
 } from "react-native";
 
+export type AppButtonVariant =
+  | "primary"
+  | "secondary"
+  | "outline"
+  | "danger";
+
 export interface AppButtonProps
   extends TouchableOpacityProps {
   title: string;
-
-  variant?: "primary" | "secondary" | "outline";
-
   loading?: boolean;
-  disabled?: boolean;
-
+  variant?: AppButtonVariant;
   style?: StyleProp<ViewStyle>;
 }

@@ -21,71 +21,103 @@ import { generateTrackingNumber } from "../utils/generateTrackingNumber";
 import { ReceiveDocumentFormData } from "../validation/receiveDocument.schema";
 import { DocumentStatus } from "../types/document.types";
 import { parseOcr } from "../utils/parseOcr";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { storageService } from "../services/storage.service";
+import { Alert } from "react-native";
 
 
 
 export default function ReceiveDocumentScreen() {
-  const navigation = useNavigation();
+  const navigation =
+  useNavigation<ReceiveDocumentNavigationProp>();
 
-  type ReceiveDocumentRouteProp = RouteProp<
-  DocumentsStackParamList,
-  "ReceiveDocument"
->;
+  const route =
+  useRoute<ReceiveDocumentRouteProp>();
 
-  const route = useRoute<ReceiveDocumentRouteProp>();
+  type ReceiveDocumentNavigationProp =
+  NativeStackNavigationProp<
+    DocumentsStackParamList,
+    "ReceiveDocument"
+  >;
 
+type ReceiveDocumentRouteProp =
+  RouteProp<
+    DocumentsStackParamList,
+    "ReceiveDocument"
+  >;
 
+  const { analysis } = route.params;
+
+  const {
+  title: aiTitle,
+  subject: aiSubject,
+  documentType: aiDocumentType,
+} = analysis;
 
   const ocrText = route.params?.ocrText ?? "";
-  console.log("=== RECEIVE SCREEN ===");
-console.log(route.params);
   const imageUri = route.params?.imageUri ?? "";
-  const aiTitle = route.params?.title ?? "";
-const aiSubject = route.params?.subject ?? "";
   const parsed = parseOcr(ocrText);
-  const aiDocumentType = route.params?.documentType ?? "";
   console.log("=== PARSED ===");
 
  async function handleCreate(
   data: ReceiveDocumentFormData
 ) {
-  const now = new Date().toISOString();
+  try {
+    const now = new Date().toISOString();
 
-  await documentService.addDocument({
-  id: "",
+    let imagePath: string | undefined;
 
-  trackingNumber: generateTrackingNumber(),
+    if (imageUri) {
+      imagePath = await storageService.uploadImage(imageUri);
+    }
 
-  documentType: "IN",
+    await documentService.addDocument({
+      id: "",
 
-  title: data.title,
+      trackingNumber: generateTrackingNumber(),
 
-  subject: data.subject,
+      direction: "IN",
 
-  departmentFrom: data.departmentFrom,
+      documentType: data.documentType,
 
-  destination: "",
+      title: data.title,
 
-  processedBy: "",
+      subject: data.subject,
 
-  receivedBy: data.receivedBy,
+      departmentFrom: data.departmentFrom,
 
-  status: DocumentStatus.RECEIVED,
+      destination: "",
 
-  remarks: data.remarks ?? "",
+      processedBy: "",
 
-  documentDate: now,
+      receivedBy: data.receivedBy,
 
-  ocrText,
+      status: DocumentStatus.RECEIVED,
 
-  attachmentUrl: imageUri,
+      remarks: data.remarks ?? "",
 
-  createdAt: now,
+      documentDate: now,
 
-  updatedAt: now,
-});
+      ocrText,
 
-  navigation.goBack();
+      attachmentUrl: imageUri,
+
+      createdAt: now,
+
+      updatedAt: now,
+
+      imagePath,
+    });
+
+    navigation.navigate("DocumentsList", {});
+  } catch (error) {
+  console.error("Upload Error:", error);
+
+  Alert.alert(
+    "Upload Failed",
+    error instanceof Error ? error.message : JSON.stringify(error)
+  );
+}
 }
 
   return (
@@ -99,7 +131,7 @@ const aiSubject = route.params?.subject ?? "";
         
 
         <DocumentForm
-            documentType="IN"
+            direction="IN"
             initialValues={{
             title: aiTitle || parsed.title,
             subject: aiSubject || parsed.subject,

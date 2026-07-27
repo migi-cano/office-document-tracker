@@ -1,4 +1,6 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { Alert, FlatList, Image } from "react-native";
+import { storageService } from "../services/storage.service";
 import {
   RouteProp,
   useRoute,
@@ -6,34 +8,32 @@ import {
   useNavigation,
 } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { Alert, FlatList } from "react-native";
-
 import {
   AppHeader,
   SafeScreen,
   ScreenContainer,
   ScrollableScreen,
 } from "../../../components/layout";
-
 import {
   AppButton,
   AppText,
 } from "../../../components/common";
-
+import {
+  formatDateTime,
+} from "../../../utils/date";
 import { DetailRow } from "../../../components/business";
 import HistoryItem from "../../../components/business/HistoryItem";
-
 import { documentService } from "../services/document.service";
 import {
   Document,
   DocumentStatus,
 } from "../types/document.types";
-
 import {
   DocumentsStackParamList,
 } from "../../../navigation/navigation.types";
-
 import { useDocumentHistory } from "../history";
+import { styles } from "./DocumentDetailsScreen.styles";
+import { View } from "react-native";
 
 type RouteProps = RouteProp<
   DocumentsStackParamList,
@@ -53,6 +53,7 @@ export default function DocumentDetailsScreen() {
 
   const [document, setDocument] =
     useState<Document>();
+  const [imageUrl, setImageUrl] = useState<string>();
 
   const {
     history,
@@ -75,6 +76,27 @@ export default function DocumentDetailsScreen() {
       load();
     }, [route.params.documentId, refresh])
   );
+
+  useEffect(() => {
+      async function loadImage() {
+        if (!document?.imagePath) {
+          setImageUrl(undefined);
+          return;
+        }
+
+        try {
+          const url = await storageService.getSignedUrl(
+            document.imagePath
+          );
+
+          setImageUrl(url);
+        } catch (error) {
+          console.error("Failed to load image:", error);
+        }
+      }
+
+      loadImage();
+    }, [document?.imagePath]);
 
   if (!document) {
     return null;
@@ -111,7 +133,7 @@ export default function DocumentDetailsScreen() {
  function getNextStatus(): DocumentStatus | null {
   if (!document) return null;
 
-  if (document.documentType === "OUT") {
+  if (document.direction === "OUT") {
     switch (document.status) {
       case DocumentStatus.PENDING:
         return DocumentStatus.RELEASED;
@@ -124,7 +146,7 @@ export default function DocumentDetailsScreen() {
     }
   }
 
-  if (document.documentType === "IN") {
+  if (document.direction === "IN") {
     switch (document.status) {
       case DocumentStatus.RECEIVED:
         return DocumentStatus.COMPLETED;
@@ -140,7 +162,7 @@ export default function DocumentDetailsScreen() {
 function getStatusButtonTitle() {
   if (!document) return "";
 
-  if (document.documentType === "OUT") {
+  if (document.direction === "OUT") {
     switch (document.status) {
       case DocumentStatus.PENDING:
         return "Release Document";
@@ -153,7 +175,7 @@ function getStatusButtonTitle() {
     }
   }
 
-  if (document.documentType === "IN") {
+  if (document.direction === "IN") {
     switch (document.status) {
       case DocumentStatus.RECEIVED:
         return "Complete Document";
@@ -190,110 +212,155 @@ async function handleStatusUpdate() {
 
           <AppHeader title="Document Details" />
 
-          <AppText>
-            {document.trackingNumber}
-          </AppText>
+          <View style={styles.section}>
+             <AppText
+                variant="heading"
+                style={styles.sectionTitle}
+              >
+                Document Information
+              </AppText>
 
-          <DetailRow
-            label="Document Type"
-            value={document.documentType}
-          />
-
-          <DetailRow
-            label="Document Title"
-            value={document.title}
-          />
-
-          <DetailRow
-            label="Subject"
-            value={document.subject}
-          />
-
-          {document.documentType === "IN" && (
-            <>
               <DetailRow
-                label="Department From"
-                value={document.departmentFrom ?? ""}
+                label="Document Type"
+                value={document.documentType}
               />
 
               <DetailRow
-                label="Received By"
-                value={document.receivedBy ?? ""}
-              />
-            </>
-          )}
-
-          {document.documentType === "OUT" && (
-            <>
-              <DetailRow
-                label="Destination"
-                value={document.destination ?? ""}
+                label="Direction"
+                value={document.direction === "IN" ? "Incoming" : "Outgoing"}
               />
 
               <DetailRow
-                label="Processed By"
-                value={document.processedBy ?? ""}
+                label="Title"
+                value={document.title}
               />
-            </>
-          )}
 
-          <DetailRow
-            label="Status"
-            value={document.status}
-          />
+              <DetailRow
+                label="Subject"
+                value={document.subject}
+              />
 
-          {getNextStatus() && (
-            <AppButton
-              title={getStatusButtonTitle()}
-              onPress={handleStatusUpdate}
-              disabled={updatingStatus}
-            />
-          )}
+              <DetailRow
+                label="Status"
+                value={document.status}
+              />
 
-          <DetailRow
-            label="Remarks"
-            value={document.remarks ?? ""}
-          />
-
-          <DetailRow
-            label="Document Date"
-            value={document.documentDate}
-          />
+              <DetailRow
+                label="Date"
+                value={formatDateTime(document.documentDate)}
+              />
+            </View>
           
+            {/* Scanned Document */}
+            {imageUrl && (
+              <View style={styles.section}>
+                <AppText
+                  variant="heading"
+                  style={styles.sectionTitle}
+                >
+                  Scanned Document
+                </AppText>
 
-          <AppButton
-            title="Edit"
-            onPress={() =>
-              navigation.navigate("EditDocument", {
-                documentId: document.id,
-              })
-            }
-          />
-
-          <AppButton
-            title="Delete Document"
-            onPress={confirmDelete}
-          />
-          
-
-          <AppText
-            variant="heading"
-            style={{
-              marginTop: 24,
-              marginBottom: 12,
-            }}
-          >
-            History
-          </AppText>
-
-          <FlatList
-            data={history}
-            keyExtractor={(item) => item.id}
-            scrollEnabled={false}
-            renderItem={({ item }) => (
-              <HistoryItem history={item} />
+                <Image
+                  source={{ uri: imageUrl }}
+                  resizeMode="contain"
+                  style={styles.image}
+                />
+              </View>
             )}
-          />
+
+            {/* Additional Information */}
+            <View style={styles.section}>
+              <AppText
+                variant="heading"
+                style={styles.sectionTitle}
+              >
+                Additional Information
+              </AppText>
+
+              <DetailRow
+                label="Tracking Number"
+                value={document.trackingNumber}
+              />
+
+              {document.direction === "IN" ? (
+                <>
+                  <DetailRow
+                    label="Department From"
+                    value={document.departmentFrom ?? "-"}
+                  />
+
+                  <DetailRow
+                    label="Received By"
+                    value={document.receivedBy ?? "-"}
+                  />
+                </>
+              ) : (
+                <>
+                  <DetailRow
+                    label="Destination"
+                    value={document.destination ?? "-"}
+                  />
+
+                  <DetailRow
+                    label="Processed By"
+                    value={document.processedBy ?? "-"}
+                  />
+                </>
+              )}
+
+              <DetailRow
+                label="Remarks"
+                value={document.remarks ?? "-"}
+              />
+            </View>
+
+            {/* Actions */}
+            <View style={styles.section}>
+              {getNextStatus() && (
+                <AppButton
+                  title={getStatusButtonTitle()}
+                  onPress={handleStatusUpdate}
+                  disabled={updatingStatus}
+                  variant="primary"
+                />
+              )}
+
+              <AppButton
+                title="Edit"
+                onPress={() =>
+                  navigation.navigate("EditDocument", {
+                    documentId: document.id,
+                  })
+                }
+                variant="secondary"
+              />
+
+              <AppButton
+                title="Delete Document"
+                onPress={confirmDelete}
+                variant="danger"
+              />
+            </View>
+
+            {/* History */}
+            <View style={styles.section}>
+              <AppText
+                variant="heading"
+                style={styles.sectionTitle}
+              >
+                History
+              </AppText>
+
+              <FlatList
+                data={history}
+                keyExtractor={(item) => item.id}
+                scrollEnabled={false}
+                renderItem={({ item }) => (
+                  <HistoryItem history={item} />
+                )}
+              />
+            </View>
 
         </ScreenContainer>
       </ScrollableScreen>

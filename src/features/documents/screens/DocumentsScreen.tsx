@@ -1,13 +1,21 @@
-import { FlatList, View } from "react-native";
-import {EmptyState,} from "../../../components/common";
-
+import {
+  FlatList,
+  View,
+  StyleSheet,
+} from "react-native";
 import { useMemo, useState } from "react";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { EmptyState } from "../../../components/common";
+import {
+  FilterModal,
+  DocumentToolbar,
+} from "../components";
 
 import {
   DocumentCard,
   SearchBar,
 } from "../../../components/business";
-
+import { RouteProp } from "@react-navigation/native";
 import {
   AppHeader,
   SafeScreen,
@@ -15,184 +23,125 @@ import {
 } from "../../../components/layout";
 
 import { useDocuments } from "../hooks/useDocuments";
-import { Button } from "react-native";
-import { useNavigation } from "@react-navigation/native";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { DocumentsStackParamList } from "../../../navigation/navigation.types";
-import { DocumentStatus } from "../types/document.types";
-import StatCard from "../../../components/business/StatCard";
 import { useDebounce } from "../../../hooks/useDebounce";
 
+import { DocumentsStackParamList } from "../../../navigation/navigation.types";
+import { DocumentStatus } from "../types/document.types";
+import { useNavigation, useRoute } from "@react-navigation/native";
+import { DocumentFilter } from "../types/document-filter.types";
 
+type DocumentsRouteProps = RouteProp<
+  DocumentsStackParamList,
+  "DocumentsList"
+>;
 
-
-export default function DocumentsScreen() {
 type DocumentsNavigationProp =
   NativeStackNavigationProp<DocumentsStackParamList>;
 
-const navigation =
-  useNavigation<DocumentsNavigationProp>();
+export default function DocumentsScreen() {
+  const navigation =
+    useNavigation<DocumentsNavigationProp>();
 
-const [search, setSearch] = useState("");
-const debouncedSearch = useDebounce(search);
+  const [search, setSearch] = useState("");
+  const debouncedSearch = useDebounce(search);
 
-const {
-  documents,
-  loading,
-  refresh,
-} = useDocuments(debouncedSearch);
+const route = useRoute<DocumentsRouteProps>();
 
-// Dashboard statistics
-const incoming = documents.filter(
-  (d) => d.documentType === "IN"
-).length;
+const [filter, setFilter] = useState<DocumentFilter>(
+  route.params?.filter ?? "ALL"
+);
 
-const outgoing = documents.filter(
-  (d) => d.documentType === "OUT"
-).length;
+    const [filterVisible, setFilterVisible] =
+  useState(false);
 
-const pending = documents.filter(
-  (d) => d.status === DocumentStatus.PENDING
-).length;
-
-const completed = documents.filter(
-  (d) => d.status === DocumentStatus.COMPLETED
-).length;
-
-const [filter, setFilter] =
-  useState<"ALL" | "IN" | "OUT">("ALL");
-const [statusFilter, setStatusFilter] =
-  useState<DocumentStatus | "ALL">("ALL");
-
-const filteredDocuments = useMemo(() => {
-  return documents.filter((document) => {
-    const matchesType =
-      filter === "ALL" || document.documentType === filter;
-
-    const matchesStatus =
-      statusFilter === "ALL" || document.status === statusFilter;
-
-    return matchesType && matchesStatus;
-  });
-}, [documents, filter, statusFilter]);
+  const {
+    documents,
+    loading,
+    refresh,
+  } = useDocuments(debouncedSearch);
 
 
- return (
-  <SafeScreen>
-    <ScreenContainer>
+  // Filter documents
+  const filteredDocuments = useMemo(() => {
+    return documents.filter((document) => {
+      switch (filter) {
+        case "IN":
+          return document.direction === "IN"
 
-      <AppHeader
-        title={`${
-          filter === "ALL"
-            ? "All Documents"
-            : filter === "IN"
-            ? "Incoming Documents"
-            : "Outgoing Documents"
-        } (${filteredDocuments.length})`}
-        subtitle="Office Document Tracker"
-      />
+        case "OUT":
+          return document.direction === "OUT"
 
-      {/* Dashboard Statistics */}
-      <View style={{ flexDirection: "row", gap: 12 }}>
-        <View style={{ flex: 1 }}>
-          <StatCard
-            title="Incoming"
-            value={incoming}
-            icon="📥"
-            onPress={() => {
-              setFilter("IN");
-              setStatusFilter("ALL");
-            }}
-          />
-        </View>
+        case "PENDING":
+          return document.status === DocumentStatus.PENDING;
 
-        <View style={{ flex: 1 }}>
-          <StatCard
-            title="Outgoing"
-            value={outgoing}
-            icon="📤"
-            onPress={() => {
-              setFilter("OUT");
-              setStatusFilter("ALL");
-            }}
-          />
-        </View>
-      </View>
+        case "RELEASED":
+          return document.status === DocumentStatus.RELEASED;
 
-      <View style={{ flexDirection: "row", gap: 12 }}>
-        <View style={{ flex: 1 }}>
-          <StatCard
-            title="Pending"
-            value={pending}
-            icon="⏳"
-            onPress={() => {
-              setFilter("ALL");
-              setStatusFilter(DocumentStatus.PENDING);
-            }}
-          />
-        </View>
+        case "COMPLETED":
+          return document.status === DocumentStatus.COMPLETED;
 
-        <View style={{ flex: 1 }}>
-          <StatCard
-            title="Completed"
-            value={completed}
-            icon="✅"
-            onPress={() => {
-              setFilter("ALL");
-              setStatusFilter(DocumentStatus.COMPLETED);
-            }}
-          />
-        </View>
-      </View>
+        default:
+          return true;
+      }
+    });
+  }, [documents, filter]);
 
-      <SearchBar
-          value={search}
-          onChangeText={setSearch}
+  const pageTitle = {
+    ALL: "All Documents",
+    IN: "Incoming Documents",
+    OUT: "Outgoing Documents",
+    PENDING: "Pending Documents",
+    RELEASED: "Released Documents",
+    COMPLETED: "Completed Documents",
+  }[filter];
+
+  return (
+    <SafeScreen>
+      <ScreenContainer>
+        <AppHeader
+          title={`${pageTitle} (${filteredDocuments.length})`}
+          subtitle="Office Document Tracker"
+        />
+
+       <DocumentToolbar
+            search={search}
+            onSearchChange={setSearch}
+            onFilterPress={() => setFilterVisible(true)}
         />
 
         <FlatList
             data={filteredDocuments}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
-                <DocumentCard
-                      document={item}
-                      onPress={() =>
-                          navigation.navigate(
-                              "DocumentDetails",
-                              {
-                                  documentId: item.id,
-                              }
-                          )
-                      }
-                  />
-            )}
-            refreshing={loading}
-            onRefresh={refresh}
-           ListEmptyComponent={
-                <EmptyState
-                    title="No Documents Found"
-                    description="Try searching with another keyword."
-                />
-                }
-            />
-
-            <Button
-                title="Open Receive Document"
+              <DocumentCard
+                document={item}
                 onPress={() =>
-                  navigation.navigate({
-                    name: "ReceiveDocument",
-                    params: {},
+                  navigation.navigate("DocumentDetails", {
+                    documentId: item.id,
                   })
                 }
               />
+            )}
+            refreshing={loading}
+            onRefresh={refresh}
+            ListEmptyComponent={
+              <EmptyState
+                title="No Documents Found"
+                description="Try searching with another keyword."
+              />
+            }
+            showsVerticalScrollIndicator={false}
+          />
 
-                <Button
-                    title="Open Outgoing Document"
-                    onPress={() =>
-                        navigation.navigate("OutgoingDocument")
-                    }
-                />
-                
+
+          <FilterModal
+            visible={filterVisible}
+            selectedFilter={filter}
+            onSelect={setFilter}
+            onClose={() => setFilterVisible(false)}
+          />
+
+          
       </ScreenContainer>
     </SafeScreen>
   );

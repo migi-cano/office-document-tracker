@@ -4,4 +4,5 @@ export interface DashboardStatCardProps {
   title: string;
   value: number;
   icon: keyof typeof Ionicons.glyphMap;
+  onPress?: () => void;
 }

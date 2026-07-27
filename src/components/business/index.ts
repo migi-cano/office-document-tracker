@@ -6,3 +6,4 @@ export { default as SearchBar } from "./SearchBar";
 export { default as DetailRow } from "./DetailRow";
 export { default as DashboardStatCard } from "./DashboardStatCard";
 export { default as StatusSelector } from "./StatusSelector";
+export { default as FilterChip } from "./FilterChip";

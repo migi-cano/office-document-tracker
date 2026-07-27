@@ -17,4 +17,8 @@ export const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: "700",
   },
+
+  pressed: {
+    opacity: 0.8,
+  },
 });

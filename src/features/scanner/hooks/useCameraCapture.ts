@@ -22,6 +22,11 @@ export function useCameraCapture() {
     setPhotoUri(null);
   }
 
+  function resetScanner() {
+  retakePhoto();
+}
+  
+
   return {
     cameraRef,
     photoUri,

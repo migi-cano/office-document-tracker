@@ -1,6 +1,9 @@
 import AppButton from "../../../components/common/AppButton";
 import AppCard from "../../../components/common/AppCard";
 import AppText from "../../../components/common/AppText";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { DocumentsStackParamList } from "../../../navigation/navigation.types";
 
 
 import {
@@ -14,7 +17,11 @@ import { useAuth } from "../../../providers/AuthProvider";
 import { useDashboard } from "../hooks/useDashboard";
 import { DashboardStatCard } from "../../../components/business";
 
+type NavigationProps =
+  NativeStackNavigationProp<DocumentsStackParamList>;
+
 export default function DashboardScreen() {
+  const navigation = useNavigation<NavigationProps>();
   const { user, logout } = useAuth();
 
   const {
@@ -83,12 +90,22 @@ export default function DashboardScreen() {
               title="Incoming"
               value={incomingDocuments}
               icon="download"
+              onPress={() =>
+                navigation.navigate("DocumentsList", {
+                  filter: "IN",
+                })
+              }
             />
 
             <DashboardStatCard
               title="Outgoing"
               value={outgoingDocuments}
               icon="paper-plane"
+              onPress={() =>
+                navigation.navigate("DocumentsList", {
+                  filter: "OUT",
+                })
+              }
             />
         </AppCard>
 

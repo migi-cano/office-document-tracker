@@ -1,4 +1,4 @@
-export type DocumentType = "IN" | "OUT";
+export type DocumentDirection = "IN" | "OUT";
 
 
 export enum DocumentStatus {
@@ -8,12 +8,21 @@ export enum DocumentStatus {
   COMPLETED = "COMPLETED",
 }
 
+export type DocumentFilter =
+  | "ALL"
+  | "IN"
+  | "OUT"
+  | "PENDING"
+  | "COMPLETED";
+
 export interface Document {
   id: string;
 
   trackingNumber: string;
 
-  documentType: DocumentType;
+  direction: DocumentDirection;
+
+  documentType: string;
 
   title: string;
 
@@ -40,4 +49,6 @@ export interface Document {
   createdAt: string;
 
   updatedAt: string;
+  
+  imagePath?: string;
 }

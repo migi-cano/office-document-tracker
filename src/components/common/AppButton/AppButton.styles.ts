@@ -1,6 +1,9 @@
 import { StyleSheet } from "react-native";
-
-import { Colors, Radius, Spacing } from "../../../theme";
+import {
+  Colors,
+  Radius,
+  Spacing,
+} from "../../../theme";
 
 export const styles = StyleSheet.create({
   button: {
@@ -25,7 +28,11 @@ export const styles = StyleSheet.create({
     borderColor: Colors.primary,
   },
 
+  danger: {
+    backgroundColor: Colors.error, // or Colors.danger if you have one
+  },
+
   disabled: {
-  opacity: 0.6,
-},
+    opacity: 0.6,
+  },
 });

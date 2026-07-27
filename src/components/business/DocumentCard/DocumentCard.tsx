@@ -1,80 +1,67 @@
 import { Pressable, View } from "react-native";
-
 import { AppText } from "../../common";
 import StatusBadge from "../StatusBadge";
-
+import {formatDateTime,} from "../../../utils/date";
 import { styles } from "./DocumentCard.styles";
 import { DocumentCardProps } from "./DocumentCard.types";
+import { Ionicons } from "@expo/vector-icons";
+import { Colors } from "../../../theme";
 
 export default function DocumentCard({
   document,
   onPress,
 }: DocumentCardProps) {
-  const isIncoming = document.documentType === "IN";
+  const isIncoming = document.direction === "IN";
 
   return (
     <Pressable onPress={onPress}>
-      <View style={styles.container}>
-        {/* Header */}
-        <View style={styles.header}>
-          <AppText variant="heading">
-            {isIncoming ? "📥 Incoming" : "📤 Outgoing"}
-          </AppText>
+  <View style={styles.container}>
 
-          <StatusBadge status={document.status} />
-        </View>
+    {/* Header */}
+    <View style={styles.header}>
+      <View style={styles.headerLeft}>
+        <Ionicons
+          name={isIncoming ? "download-outline" : "paper-plane-outline"}
+          size={18}
+          color={Colors.primary}
+        />
 
-        {/* Document Title */}
+        <AppText variant="caption">
+          {isIncoming ? "Incoming" : "Outgoing"}
+        </AppText>
+      </View>
+    </View>
+
+    {/* Body */}
+    <View style={styles.body}>
         <AppText
           variant="heading"
-          style={styles.subject}
+          style={styles.title}
+          numberOfLines={2}
         >
           {document.title}
         </AppText>
 
-        {/* Subject */}
-        <AppText variant="body">
+        <AppText
+          variant="body"
+          style={styles.subject}
+          numberOfLines={2}
+        >
           {document.subject}
         </AppText>
-
-        {/* Tracking Number */}
-        <AppText variant="caption">
-          Tracking #: {document.trackingNumber}
-        </AppText>
-
-        {/* Incoming Details */}
-        {isIncoming && (
-          <>
-            <AppText variant="caption">
-              Department From: {document.departmentFrom ?? "-"}
-            </AppText>
-
-            <AppText variant="caption">
-              Received By: {document.receivedBy ?? "-"}
-            </AppText>
-          </>
-        )}
-
-        {/* Outgoing Details */}
-        {!isIncoming && (
-          <>
-            <AppText variant="caption">
-              Destination: {document.destination ?? "-"}
-            </AppText>
-
-            <AppText variant="caption">
-              Processed By: {document.processedBy ?? "-"}
-            </AppText>
-          </>
-        )}
-
-        {/* Footer */}
-        <View style={styles.footer}>
-          <AppText variant="caption">
-            {document.documentDate}
-          </AppText>
-        </View>
       </View>
-    </Pressable>
+
+
+    {/* Footer */}
+    <View style={styles.footer}>
+      <AppText variant="caption">
+        {formatDateTime(document.documentDate)}
+      </AppText>
+
+      <StatusBadge status={document.status} />
+    </View>
+
+  </View>
+</Pressable>
   );
 }

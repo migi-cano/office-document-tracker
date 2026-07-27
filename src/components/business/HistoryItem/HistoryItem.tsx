@@ -4,6 +4,9 @@ import { AppText } from "../../common";
 
 import { styles } from "./HistoryItem.styles";
 import { HistoryItemProps } from "./HistoryItem.types";
+import {
+  formatDateTime,
+} from "../../../utils/date";
 
 export default function HistoryItem({
   history,
@@ -15,7 +18,7 @@ export default function HistoryItem({
       </AppText>
 
       <AppText variant="caption">
-        {history.createdAt}
+        {formatDateTime(history.createdAt)}
       </AppText>
 
       {history.oldStatus &&
