@@ -1,9 +1,10 @@
 import AppButton from "../../../components/common/AppButton";
 import AppCard from "../../../components/common/AppCard";
 import AppText from "../../../components/common/AppText";
-import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { DocumentsStackParamList } from "../../../navigation/navigation.types";
+import { CompositeNavigationProp, useNavigation } from "@react-navigation/native";
+import { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
 
 
 import {
@@ -16,9 +17,12 @@ import {
 import { useAuth } from "../../../providers/AuthProvider";
 import { useDashboard } from "../hooks/useDashboard";
 import { DashboardStatCard } from "../../../components/business";
+import {
+  MainTabParamList,
+  RootStackParamList,
+} from "../../../navigation/navigation.types";
 
-type NavigationProps =
-  NativeStackNavigationProp<DocumentsStackParamList>;
+type NavigationProps = BottomTabNavigationProp<MainTabParamList>;
 
 export default function DashboardScreen() {
   const navigation = useNavigation<NavigationProps>();
@@ -91,8 +95,11 @@ export default function DashboardScreen() {
               value={incomingDocuments}
               icon="download"
               onPress={() =>
-                navigation.navigate("DocumentsList", {
-                  filter: "IN",
+                navigation.navigate("Documents", {
+                  screen: "DocumentsList",
+                  params: {
+                    filter: "IN",
+                  },
                 })
               }
             />
@@ -102,8 +109,11 @@ export default function DashboardScreen() {
               value={outgoingDocuments}
               icon="paper-plane"
               onPress={() =>
-                navigation.navigate("DocumentsList", {
-                  filter: "OUT",
+                navigation.navigate("Documents", {
+                    screen: "DocumentsList",
+                    params: {
+                      filter: "OUT",
+                  },
                 })
               }
             />

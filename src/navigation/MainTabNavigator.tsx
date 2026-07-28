@@ -7,8 +7,9 @@ import ScannerScreen from "../features/scanner/screens/ScannerScreen";
 import UsersScreen from "../features/users/screens/UsersScreen";
 import SettingsScreen from "../features/settings/screens/SettingsScreen";
 import DocumentsNavigator from "./DocumentsNavigator";
+import { MainTabParamList } from "./navigation.types";
 
-const Tab = createBottomTabNavigator();
+const Tab = createBottomTabNavigator<MainTabParamList>();
 
 export default function MainTabNavigator() {
   return (

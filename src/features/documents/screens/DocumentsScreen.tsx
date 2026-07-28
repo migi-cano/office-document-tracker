@@ -38,9 +38,9 @@ type DocumentsRouteProps = RouteProp<
 type DocumentsNavigationProp =
   NativeStackNavigationProp<DocumentsStackParamList>;
 
+
 export default function DocumentsScreen() {
-  const navigation =
-    useNavigation<DocumentsNavigationProp>();
+const navigation = useNavigation<DocumentsNavigationProp>();
 
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounce(search);

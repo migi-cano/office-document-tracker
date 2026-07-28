@@ -10,7 +10,7 @@ export function useCameraCapture() {
     if (!cameraRef.current) return;
 
     const photo = await cameraRef.current.takePictureAsync({
-      quality: 0.8,
+      quality: 0.5,
     });
 
     if (!photo) return;
@@ -21,10 +21,6 @@ export function useCameraCapture() {
   function retakePhoto() {
     setPhotoUri(null);
   }
-
-  function resetScanner() {
-  retakePhoto();
-}
   
 
   return {
