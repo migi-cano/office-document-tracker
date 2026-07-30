@@ -1,78 +1,96 @@
+import dayjs from "dayjs";
+
 import { supabase } from "../../../lib/supabase";
-import { DocumentStatus } from "../../documents/types/document.types";
 
-
-export interface DashboardStats {
-  totalDocuments: number;
-
-  pending: number;
-
-  received: number;
-
-  released: number;
-
-  completed: number;
-
-  incoming: number;
-
-  outgoing: number;
-}
+import {
+  ActivityPoint,
+  DashboardMetrics,
+} from "../types/dashboard.types";
 
 class DashboardService {
-  async getStatistics() {
+  async getMetrics(): Promise<DashboardMetrics> {
     const { data, error } = await supabase
-  .from("documents")
-  .select("status, document_type");
+      .from("documents")
+      .select("status,direction");
 
     if (error) {
       throw error;
     }
 
-   const totalDocuments = data.length;
+    const metrics: DashboardMetrics = {
+      total: data.length,
+      pending: 0,
+      incoming: 0,
+      outgoing: 0,
+    };
 
-const receivedDocuments = data.filter(
-  d => d.status === DocumentStatus.RECEIVED
-).length;
+    data.forEach((document) => {
+      const status = document.status?.trim().toUpperCase();
+      const direction = document.direction?.trim().toUpperCase();
 
-const pendingDocuments = data.filter(
-  d => d.status === DocumentStatus.PENDING
-).length;
+      switch (status) {
+        case "PENDING":
+          metrics.pending++;
+          break;
+      }
 
-const releasedDocuments = data.filter(
-  d => d.status === DocumentStatus.RELEASED
-).length;
+      switch (direction) {
+        case "IN":
+          metrics.incoming++;
+          break;
 
-const completedDocuments = data.filter(
-  d => d.status === DocumentStatus.COMPLETED
-).length;
+        case "OUT":
+          metrics.outgoing++;
+          break;
+      }
+    });
 
-const incomingDocuments = data.filter(
-  d => d.document_type === "IN"
-).length;
+    return metrics;
+  }
 
-const outgoingDocuments = data.filter(
-  d => d.document_type === "OUT"
-).length;
+  async getActivityOverview(): Promise<ActivityPoint[]> {
+    const { data, error } = await supabase
+      .from("documents")
+      .select("created_at")
+      .order("created_at", { ascending: true });
 
+    if (error) {
+      throw error;
+    }
 
-    return {
-  totalDocuments,
-  receivedDocuments,
-  pendingDocuments,
-  releasedDocuments,
-  completedDocuments,
-  incomingDocuments,
-  outgoingDocuments,
-};
+    const activity: ActivityPoint[] = Array.from(
+      { length: 7 },
+      (_, index) => {
+        const date = dayjs().subtract(6 - index, "day");
+
+        return {
+          label: date.format("ddd"),
+          date: date.format("YYYY-MM-DD"),
+          value: 0,
+        };
+      }
+    );
+
+    data.forEach((document) => {
+      const created = dayjs(document.created_at).format("YYYY-MM-DD");
+
+      const point = activity.find(
+        (item) => item.date === created
+      );
+
+      if (point) {
+        point.value++;
+      }
+    });
+
+    return activity;
   }
 
   async getRecentDocuments() {
     const { data, error } = await supabase
       .from("documents")
       .select("*")
-      .order("created_at", {
-        ascending: false,
-      })
+      .order("created_at", { ascending: false })
       .limit(5);
 
     if (error) {
@@ -81,7 +99,24 @@ const outgoingDocuments = data.filter(
 
     return data;
   }
+
+  async getDashboardData() {
+    const [
+      metrics,
+      activity,
+      recentDocuments,
+    ] = await Promise.all([
+      this.getMetrics(),
+      this.getActivityOverview(),
+      this.getRecentDocuments(),
+    ]);
+
+    return {
+      metrics,
+      activity,
+      recentDocuments,
+    };
+  }
 }
 
-export const dashboardService =
-  new DashboardService();
+export default new DashboardService();

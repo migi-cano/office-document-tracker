@@ -1,11 +1,11 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Pressable, View } from "react-native";
 
-import AppCard from "../../common/AppCard";
-import AppText from "../../common/AppText";
+import AppCard from "../../../../components/common/AppCard";
+import AppText from "../../../../components/common/AppText";
 
-import { DashboardStatCardProps } from "./DashboardStatCard.types";
-import { styles } from "./DashboardStatCard.styles";
+import { DashboardStatCardProps } from "../../../../components/business/DashboardStatCard/DashboardStatCard.types";
+import { styles } from "../../../../components/business/DashboardStatCard/DashboardStatCard.styles";
 
 export default function DashboardStatCard({
   title,
@@ -26,11 +26,13 @@ export default function DashboardStatCard({
           ]}
         >
           <View style={styles.header}>
-            <AppText>{title}</AppText>
+            <AppText style={styles.title}>
+              {title}
+            </AppText>
 
             <Ionicons
               name={icon}
-              size={24}
+              size={22}
             />
           </View>
 

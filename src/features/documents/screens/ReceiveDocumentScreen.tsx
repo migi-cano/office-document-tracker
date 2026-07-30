@@ -109,7 +109,14 @@ type ReceiveDocumentRouteProp =
       imagePath,
     });
 
-    navigation.navigate("DocumentsList", {});
+    navigation.reset({
+  index: 0,
+  routes: [
+    {
+      name: "DocumentsList",
+    },
+  ],
+});
   } catch (error) {
   console.error("Upload Error:", error);
 

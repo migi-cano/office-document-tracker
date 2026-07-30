@@ -1,66 +1,70 @@
 import { useCallback, useState } from "react";
+
+import { Icons } from "../../../../assets/icons";
+import { dashboardService } from "../services";
+import {
+  ActivityPoint,
+  DashboardMetric,
+} from "../types/dashboard.types";
 import { useFocusEffect } from "@react-navigation/native";
-
-import { dashboardService } from "../services/dashboard.service";
-
 import { Document } from "../../documents/types/document.types";
 
 export function useDashboard() {
+  const [metrics, setMetrics] = useState<DashboardMetric[]>([]);
   const [loading, setLoading] = useState(true);
-
-  const [totalDocuments, setTotalDocuments] = useState(0);
-  const [receivedDocuments, setReceivedDocuments] = useState(0);
-  const [pendingDocuments, setPendingDocuments] = useState(0);
-  const [releasedDocuments, setReleasedDocuments] = useState(0);
+  const [activity, setActivity] = useState<ActivityPoint[]>([]);
   const [recentDocuments, setRecentDocuments] = useState<Document[]>([]);
-  const [completedDocuments, setCompletedDocuments] = useState(0);
-  const [incomingDocuments, setIncomingDocuments] = useState(0);
-  const [outgoingDocuments, setOutgoingDocuments] = useState(0);
 
-async function loadDashboard() {
-  try {
-    setLoading(true);
+  const loadDashboard = useCallback(async () => {
+    try {
+      setLoading(true);
 
-    const statistics =
-      await dashboardService.getStatistics();
+      const data = await dashboardService.getDashboardData();
 
-    const recent =
-      await dashboardService.getRecentDocuments();
+      setMetrics([
+              {
+                title: "Total",
+                value: data.metrics.total,
+                icon: Icons.paper,
+              },
+              {
+                title: "Pending",
+                value: data.metrics.pending,
+                icon: Icons.waitingList,
+              },
+              {
+                title: "Outgoing",
+                value: data.metrics.outgoing,
+                icon: Icons.send,
+              },
+              {
+                title: "Incoming",
+                value: data.metrics.incoming,
+                icon: Icons.document,
+              },
+            ]);
 
-    setTotalDocuments(statistics.totalDocuments);
-    setReceivedDocuments(statistics.receivedDocuments);
-    setPendingDocuments(statistics.pendingDocuments);
-    setReleasedDocuments(statistics.releasedDocuments);
-    setCompletedDocuments(statistics.completedDocuments);
-    setIncomingDocuments(statistics.incomingDocuments);
-    setOutgoingDocuments(statistics.outgoingDocuments);
+            setActivity(data.activity);
+            setRecentDocuments(data.recentDocuments);
 
-    setRecentDocuments(recent);
-  } finally {
-    setLoading(false);
-  }
-}
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
-useFocusEffect(
+  useFocusEffect(
   useCallback(() => {
     loadDashboard();
-  }, [])
+  }, [loadDashboard])
 );
 
   return {
-  loading,
-
-  totalDocuments,
-  receivedDocuments,
-  pendingDocuments,
-  releasedDocuments,
-  completedDocuments,
-
-  incomingDocuments,
-  outgoingDocuments,
-
-  recentDocuments,
-
-  refresh: loadDashboard,
-};
+    metrics,
+    activity,
+    recentDocuments,
+    loading,
+    refresh: loadDashboard,
+  };
 }

@@ -14,7 +14,6 @@ export default function ScrollableScreen({
       contentContainerStyle={[
         {
           flexGrow: 1,
-          padding: 16,
         },
         contentContainerStyle,
       ]}

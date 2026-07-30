@@ -15,7 +15,6 @@ import {
   DocumentCard,
   SearchBar,
 } from "../../../components/business";
-import { RouteProp } from "@react-navigation/native";
 import {
   AppHeader,
   SafeScreen,
@@ -27,13 +26,8 @@ import { useDebounce } from "../../../hooks/useDebounce";
 
 import { DocumentsStackParamList } from "../../../navigation/navigation.types";
 import { DocumentStatus } from "../types/document.types";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import { useNavigation} from "@react-navigation/native";
 import { DocumentFilter } from "../types/document-filter.types";
-
-type DocumentsRouteProps = RouteProp<
-  DocumentsStackParamList,
-  "DocumentsList"
->;
 
 type DocumentsNavigationProp =
   NativeStackNavigationProp<DocumentsStackParamList>;
@@ -45,11 +39,8 @@ const navigation = useNavigation<DocumentsNavigationProp>();
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounce(search);
 
-const route = useRoute<DocumentsRouteProps>();
 
-const [filter, setFilter] = useState<DocumentFilter>(
-  route.params?.filter ?? "ALL"
-);
+const [filter, setFilter] = useState<DocumentFilter>("ALL");
 
     const [filterVisible, setFilterVisible] =
   useState(false);
