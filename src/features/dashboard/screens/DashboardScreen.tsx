@@ -14,7 +14,6 @@ import {
 } from "../components";
 import { useDashboard } from "../hooks";
 import {
-  BottomTabNavigationProp,
   BottomTabScreenProps,
 } from "@react-navigation/bottom-tabs";
 import {
@@ -66,21 +65,15 @@ export default function DashboardScreen({ navigation }: Props) {
             <RecentDocumentsSection
               documents={recentDocuments}
               onViewAll={() =>
-                navigation.navigate({
-                  name: "Documents",
-                  params: {
-                    screen: "DocumentsList",
-                  },
+                navigation.navigate("Documents", {
+                  screen: "DocumentsList",
                 })
               }
               onPressDocument={(documentId) =>
-                navigation.navigate({
-                  name: "Documents",
+                navigation.navigate("Documents", {
+                  screen: "DocumentDetails",
                   params: {
-                    screen: "DocumentDetails",
-                    params: {
-                      documentId,
-                    },
+                    documentId: documentId,
                   },
                 })
               }

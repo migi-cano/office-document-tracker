@@ -24,6 +24,7 @@ import { parseOcr } from "../utils/parseOcr";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { storageService } from "../services/storage.service";
 import { Alert } from "react-native";
+import { useDepartments } from "../../departments/hooks/useDepartments";
 
 
 
@@ -47,6 +48,8 @@ type ReceiveDocumentRouteProp =
   >;
 
   const { analysis } = route.params;
+
+  const { departments, loading } = useDepartments();
 
   const {
   title: aiTitle,

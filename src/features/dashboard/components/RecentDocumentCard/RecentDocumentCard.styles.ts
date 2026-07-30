@@ -2,20 +2,20 @@ import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
   container: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: 16,
-    padding: 16,
+  backgroundColor: "#FFFFFF",
+  borderRadius: 16,
+  padding: 16,
 
-    shadowColor: "#000",
-    shadowOpacity: 0.08,
-    shadowRadius: 10,
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-
-    elevation: 3,
+  shadowColor: "#000",
+  shadowOffset: {
+    width: 0,
+    height: 2,
   },
+  shadowOpacity: 0.08,
+  shadowRadius: 6,
+
+  elevation: 3,
+},
 
   header: {
     flexDirection: "row",
@@ -29,43 +29,63 @@ export const styles = StyleSheet.create({
   },
 
   title: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: "#0F172A",
-  },
+  flex: 1,
+  fontSize: 16,
+  fontWeight: "700",
+  color: "#0F172A",
+},
 
   trackingNumber: {
-    marginTop: 4,
-    fontSize: 13,
-    color: "#64748B",
-  },
+  fontSize: 13,
+  color: "#244a96",
+  marginTop: 6,
+},
 
   statusBadge: {
-    backgroundColor: "#EFF6FF",
-    borderRadius: 20,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-  },
+  borderRadius: 20,
+  paddingHorizontal: 14,
+  paddingVertical: 6,
+  alignSelf: "flex-start",
+},
 
   statusText: {
-    fontSize: 12,
-    fontWeight: "600",
-    color: "#2563EB",
-    textTransform: "uppercase",
-  },
+  fontSize: 12,
+  fontWeight: "600",
+  textTransform: "uppercase",
+},
 
   body: {
-    marginTop: 14,
-  },
+  flexDirection: "row",
+  justifyContent: "space-between",
+  alignItems: "center",
+  marginTop: 12,
+  paddingTop: 12,
+  borderTopWidth: 1,
+  borderTopColor: "#a0a5af",
+},
 
-  department: {
-    fontSize: 14,
-    color: "#334155",
-  },
+ department: {
+  flex: 1,
+  fontSize: 14,
+  color: "#374151",
+  marginRight: 12,
+},
 
   date: {
-    marginTop: 6,
-    fontSize: 13,
-    color: "#94A3B8",
-  },
+  fontSize: 13,
+  color: "#9CA3AF",
+  flexShrink: 0,
+},
+
+  titleRow: {
+  flexDirection: "row",
+  alignItems: "center",
+},
+
+icon: {
+  width: 28,
+  height: 28,
+  resizeMode: "contain",
+  marginRight: 8,
+},
 });

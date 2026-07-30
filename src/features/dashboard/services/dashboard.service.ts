@@ -6,6 +6,7 @@ import {
   ActivityPoint,
   DashboardMetrics,
 } from "../types/dashboard.types";
+import { Document } from "../../documents/types/document.types";
 
 class DashboardService {
   async getMetrics(): Promise<DashboardMetrics> {
@@ -86,19 +87,45 @@ class DashboardService {
     return activity;
   }
 
-  async getRecentDocuments() {
-    const { data, error } = await supabase
-      .from("documents")
-      .select("*")
-      .order("created_at", { ascending: false })
-      .limit(5);
+  async getRecentDocuments(): Promise<Document[]> {
+  const { data, error } = await supabase
+    .from("documents")
+    .select("*")
+    .order("created_at", { ascending: false })
+    .limit(5);
 
-    if (error) {
-      throw error;
-    }
-
-    return data;
+  if (error) {
+    throw error;
   }
+
+  return data.map((row) => ({
+    id: row.id,
+    trackingNumber: row.tracking_number,
+    direction: row.direction,
+    documentType: row.document_type,
+    title: row.title,
+    subject: row.subject,
+
+    destination: row.destination,
+    departmentFrom: row.department_from,
+    processedBy: row.processed_by,
+    receivedBy: row.received_by,
+
+    status: row.status,
+
+    remarks: row.remarks,
+
+    documentDate: row.document_date,
+
+    attachmentUrl: row.attachment_url,
+    ocrText: row.ocr_text,
+
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+
+    imagePath: row.image_path,
+  }));
+}
 
   async getDashboardData() {
     const [
