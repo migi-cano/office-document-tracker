@@ -7,9 +7,7 @@ export type RootStackParamList = {
 };
 
 export type DocumentsStackParamList = {
-DocumentsList: {
-  filter?: "ALL" | "IN" | "OUT" | "PENDING" | "COMPLETED";
-};
+DocumentsList: undefined;
 
  DocumentPreview: {
     imageUri: string;

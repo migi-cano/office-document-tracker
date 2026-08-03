@@ -1,16 +1,21 @@
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { styles } from "./SafeScreen.styles";
+import { SafeScreenProps } from "./SafeScreen.types";
 
 export default function SafeScreen({
   children,
-}: {
-  children: React.ReactNode;
-}) {
+  backgroundColor = "#FFFFFF",
+  style,
+}: SafeScreenProps) {
   return (
     <SafeAreaView
-      edges={["top", "left", "right"]}
-      style={styles.container}
+      style={[
+        {
+          flex: 1,
+          backgroundColor,
+        },
+        style,
+      ]}
     >
       {children}
     </SafeAreaView>

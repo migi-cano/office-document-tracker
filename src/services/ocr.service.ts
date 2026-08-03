@@ -1,6 +1,7 @@
 import * as FileSystem from "expo-file-system/legacy";
 import { documentParser } from "../features/scanner/services/documentParser.service";
 import { ExtractedDocument } from "../features/scanner/types/ocr.types";
+import * as ImageManipulator from "expo-image-manipulator";
 
 class OCRService {
   async extractDocument(
@@ -12,7 +13,21 @@ class OCRService {
     if (!apiKey) {
       throw new Error("OCR.Space API key is missing.");
     }
+console.log("Image URI:", imageUri);
 
+const compressed = await ImageManipulator.manipulateAsync(
+  imageUri,
+  [],
+  {
+    compress: 0.6,
+    format: ImageManipulator.SaveFormat.JPEG,
+  }
+);
+
+imageUri = compressed.uri;
+
+const info = await FileSystem.getInfoAsync(imageUri);
+console.log("Image Info:", info);
     const base64 = await FileSystem.readAsStringAsync(imageUri, {
       encoding: FileSystem.EncodingType.Base64,
     });
@@ -39,11 +54,17 @@ class OCRService {
     );
 
     if (!response.ok) {
-      throw new Error("OCR request failed.");
-    }
+  const errorText = await response.text();
+
+   console.error("OCR Status:", response.status);
+  console.error("OCR Response:", errorText);
+
+   throw new Error(
+    `OCR request failed (${response.status})`
+  );}
 
     const json = await response.json();
-
+console.log("OCR JSON:", JSON.stringify(json, null, 2));  
     const fullText =
       json?.ParsedResults?.[0]?.ParsedText ?? "";
 

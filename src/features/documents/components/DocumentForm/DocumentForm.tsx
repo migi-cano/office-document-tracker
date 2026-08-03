@@ -1,11 +1,12 @@
 import { View } from "react-native";
 import { Controller } from "react-hook-form";
-import {AppButton,AppInput,AppText,} from "../../../../components/common";
+import {AppButton,AppInput,AppText, AppSelect,} from "../../../../components/common";
 import { useReceiveDocument } from "../../hooks/useReceiveDocument";
 import { DocumentFormProps } from "./DocumentForm.types";
 import { styles } from "./DocumentForm.styles";
 import IncomingFields from "./IncomingFields";
 import OutgoingFields from "./OutgoingFields";
+import { DOCUMENT_TYPES } from "../../../../types";
 
 
 export default function DocumentForm({
@@ -14,16 +15,12 @@ export default function DocumentForm({
   submitButtonTitle = "Save Document",
   onSubmit,
 }: DocumentFormProps) {
-
-  console.log("=== DOCUMENT FORM ===");
-console.log(initialValues);
   
   
   const {
   control,
   handleSubmit,
 } = useReceiveDocument(initialValues);
-
   return (
     <View style={styles.container}>
       <AppInput
@@ -79,20 +76,14 @@ console.log(initialValues);
   control={control}
   name="documentType"
   render={({ field, fieldState }) => (
-    <>
-      <AppInput
+    <AppSelect
         label="Document Type"
-        placeholder="Enter document type"
+        placeholder="Select document type"
         value={field.value}
-        onChangeText={field.onChange}
+        onChange={field.onChange}
+        options={DOCUMENT_TYPES}
+        error={fieldState.error?.message}
       />
-
-      {fieldState.error && (
-        <AppText style={{ color: "red" }}>
-          {fieldState.error.message}
-        </AppText>
-      )}
-    </>
   )}
 />
 

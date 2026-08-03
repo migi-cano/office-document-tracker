@@ -1,87 +1,149 @@
+import dayjs from "dayjs";
+
 import { supabase } from "../../../lib/supabase";
-import { DocumentStatus } from "../../documents/types/document.types";
 
-
-export interface DashboardStats {
-  totalDocuments: number;
-
-  pending: number;
-
-  received: number;
-
-  released: number;
-
-  completed: number;
-
-  incoming: number;
-
-  outgoing: number;
-}
+import {
+  ActivityPoint,
+  DashboardMetrics,
+} from "../types/dashboard.types";
+import { Document } from "../../documents/types/document.types";
 
 class DashboardService {
-  async getStatistics() {
-    const { data, error } = await supabase
-  .from("documents")
-  .select("status, document_type");
-
-    if (error) {
-      throw error;
-    }
-
-   const totalDocuments = data.length;
-
-const receivedDocuments = data.filter(
-  d => d.status === DocumentStatus.RECEIVED
-).length;
-
-const pendingDocuments = data.filter(
-  d => d.status === DocumentStatus.PENDING
-).length;
-
-const releasedDocuments = data.filter(
-  d => d.status === DocumentStatus.RELEASED
-).length;
-
-const completedDocuments = data.filter(
-  d => d.status === DocumentStatus.COMPLETED
-).length;
-
-const incomingDocuments = data.filter(
-  d => d.document_type === "IN"
-).length;
-
-const outgoingDocuments = data.filter(
-  d => d.document_type === "OUT"
-).length;
-
-
-    return {
-  totalDocuments,
-  receivedDocuments,
-  pendingDocuments,
-  releasedDocuments,
-  completedDocuments,
-  incomingDocuments,
-  outgoingDocuments,
-};
-  }
-
-  async getRecentDocuments() {
+  async getMetrics(): Promise<DashboardMetrics> {
     const { data, error } = await supabase
       .from("documents")
-      .select("*")
-      .order("created_at", {
-        ascending: false,
-      })
-      .limit(5);
+      .select("status,direction");
 
     if (error) {
       throw error;
     }
 
-    return data;
+    const metrics: DashboardMetrics = {
+      total: data.length,
+      pending: 0,
+      incoming: 0,
+      outgoing: 0,
+    };
+
+    data.forEach((document) => {
+      const status = document.status?.trim().toUpperCase();
+      const direction = document.direction?.trim().toUpperCase();
+
+      switch (status) {
+        case "PENDING":
+          metrics.pending++;
+          break;
+      }
+
+      switch (direction) {
+        case "IN":
+          metrics.incoming++;
+          break;
+
+        case "OUT":
+          metrics.outgoing++;
+          break;
+      }
+    });
+
+    return metrics;
+  }
+
+  async getActivityOverview(): Promise<ActivityPoint[]> {
+    const { data, error } = await supabase
+      .from("documents")
+      .select("created_at")
+      .order("created_at", { ascending: true });
+
+    if (error) {
+      throw error;
+    }
+
+    const activity: ActivityPoint[] = Array.from(
+      { length: 7 },
+      (_, index) => {
+        const date = dayjs().subtract(6 - index, "day");
+
+        return {
+          label: date.format("ddd"),
+          date: date.format("YYYY-MM-DD"),
+          value: 0,
+        };
+      }
+    );
+
+    data.forEach((document) => {
+      const created = dayjs(document.created_at).format("YYYY-MM-DD");
+
+      const point = activity.find(
+        (item) => item.date === created
+      );
+
+      if (point) {
+        point.value++;
+      }
+    });
+
+    return activity;
+  }
+
+  async getRecentDocuments(): Promise<Document[]> {
+  const { data, error } = await supabase
+    .from("documents")
+    .select("*")
+    .order("created_at", { ascending: false })
+    .limit(5);
+
+  if (error) {
+    throw error;
+  }
+
+  return data.map((row) => ({
+    id: row.id,
+    trackingNumber: row.tracking_number,
+    direction: row.direction,
+    documentType: row.document_type,
+    title: row.title,
+    subject: row.subject,
+
+    destination: row.destination,
+    departmentFrom: row.department_from,
+    processedBy: row.processed_by,
+    receivedBy: row.received_by,
+
+    status: row.status,
+
+    remarks: row.remarks,
+
+    documentDate: row.document_date,
+
+    attachmentUrl: row.attachment_url,
+    ocrText: row.ocr_text,
+
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+
+    imagePath: row.image_path,
+  }));
+}
+
+  async getDashboardData() {
+    const [
+      metrics,
+      activity,
+      recentDocuments,
+    ] = await Promise.all([
+      this.getMetrics(),
+      this.getActivityOverview(),
+      this.getRecentDocuments(),
+    ]);
+
+    return {
+      metrics,
+      activity,
+      recentDocuments,
+    };
   }
 }
 
-export const dashboardService =
-  new DashboardService();
+export default new DashboardService();

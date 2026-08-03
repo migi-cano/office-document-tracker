@@ -1,130 +1,86 @@
-import AppButton from "../../../components/common/AppButton";
-import AppCard from "../../../components/common/AppCard";
-import AppText from "../../../components/common/AppText";
-import { useNavigation } from "@react-navigation/native";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { DocumentsStackParamList } from "../../../navigation/navigation.types";
-
-
+import { StatusBar } from "expo-status-bar";
+import { View } from "react-native";
 import {
-  AppHeader,
   SafeScreen,
-  ScreenContainer,
   ScrollableScreen,
 } from "../../../components/layout";
+import { styles } from "./DashboardScreen.styles";
+import {
+  DashboardTopBar,
+  DashboardGreeting,
+  DashboardMetricGrid,
+  DashboardActivityChart,
+  RecentDocumentsSection
+} from "../components";
+import { useDashboard } from "../hooks";
+import {
+  BottomTabScreenProps,
+} from "@react-navigation/bottom-tabs";
+import {
+  MainTabParamList,
+} from "../../../navigation/navigation.types";
 
-import { useAuth } from "../../../providers/AuthProvider";
-import { useDashboard } from "../hooks/useDashboard";
-import { DashboardStatCard } from "../../../components/business";
+type Props = BottomTabScreenProps<MainTabParamList, "Dashboard">;
 
-type NavigationProps =
-  NativeStackNavigationProp<DocumentsStackParamList>;
 
-export default function DashboardScreen() {
-  const navigation = useNavigation<NavigationProps>();
-  const { user, logout } = useAuth();
 
+export default function DashboardScreen({ navigation }: Props) {
   const {
-  loading,
-  totalDocuments,
-  receivedDocuments,
-  pendingDocuments,
-  releasedDocuments,
-  completedDocuments,
-  incomingDocuments,
-  outgoingDocuments,
-  recentDocuments,
-} = useDashboard();
+    metrics,
+    activity,
+    recentDocuments,
+    loading,
+  } = useDashboard();
 
-  if (loading) {
-    return (
-      <SafeScreen>
-        <ScreenContainer>
-          <AppText>Loading...</AppText>
-        </ScreenContainer>
-      </SafeScreen>
-    );
-  }
+  
 
   return (
-    <SafeScreen>
-      <ScrollableScreen>
-      <ScreenContainer>
-        <AppHeader
-          title="Office Document Tracker"
-          subtitle={`Welcome, ${user?.name}`}
-        />
+    <SafeScreen backgroundColor="#0D1233">
+      <StatusBar style="light" />
 
-        <AppCard>
-          <DashboardStatCard
-              title="Total Documents"
-              value={totalDocuments}
-              icon="document-text"
-          />
+      <DashboardTopBar
+        title="Office Document Tracker"
+        initials="JM"
+      />
 
-          <DashboardStatCard
-              title="Received"
-              value={receivedDocuments}
-              icon="mail"
-          />
+      <View style={styles.container}>
+        <ScrollableScreen
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={styles.content}>
+            <DashboardGreeting
+                greeting="Good Morning"
+                name="Beluga"
+                onNotificationPress={() => {
+                  // TODO: Navigate to notifications
+                }}
+              />
 
-          <DashboardStatCard
-              title="Pending"
-              value={pendingDocuments}
-              icon="time"
-          />
+              <DashboardMetricGrid metrics={metrics} />
 
-          <DashboardStatCard
-              title="Released"
-              value={releasedDocuments}
-              icon="checkmark-circle"
-          />
+              <DashboardActivityChart
+                  data={activity}
+                />
 
-          <DashboardStatCard
-              title="Completed"
-              value={completedDocuments}
-              icon="checkmark-done"
-            />
-
-            <DashboardStatCard
-              title="Incoming"
-              value={incomingDocuments}
-              icon="download"
-              onPress={() =>
-                navigation.navigate("DocumentsList", {
-                  filter: "IN",
+            <RecentDocumentsSection
+              documents={recentDocuments}
+              onViewAll={() =>
+                navigation.navigate("Documents", {
+                  screen: "DocumentsList",
+                })
+              }
+              onPressDocument={(documentId) =>
+                navigation.navigate("Documents", {
+                  screen: "DocumentDetails",
+                  params: {
+                    documentId: documentId,
+                  },
                 })
               }
             />
-
-            <DashboardStatCard
-              title="Outgoing"
-              value={outgoingDocuments}
-              icon="paper-plane"
-              onPress={() =>
-                navigation.navigate("DocumentsList", {
-                  filter: "OUT",
-                })
-              }
-            />
-        </AppCard>
-
-        <AppCard>
-          <AppText>Recent Documents</AppText>
-
-          {recentDocuments.map((document) => (
-            <AppText key={document.id}>
-              • {document.subject}
-            </AppText>
-          ))}
-        </AppCard>
-
-        <AppButton
-          title="Logout"
-          onPress={logout}
-        />
-      </ScreenContainer>
-      </ScrollableScreen>
+          </View>
+        </ScrollableScreen>
+      </View>
     </SafeScreen>
   );
 }

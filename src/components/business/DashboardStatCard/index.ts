@@ -1,1 +1,1 @@
-export { default } from "./DashboardStatCard";
+export { default } from "../../../features/dashboard/components/DashboardMetricCard/DashboardStatCard"

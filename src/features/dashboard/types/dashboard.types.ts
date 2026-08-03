@@ -1,12 +1,20 @@
-export interface DashboardStats {
-  received: number;
-  released: number;
-  pending: number;
-  users: number;
+import { ImageSourcePropType } from "react-native";
+
+export interface DashboardMetric {
+  title: string;
+  value: number;
+  icon: ImageSourcePropType;
 }
 
-export interface ActivityItem {
-  id: string;
-  message: string;
+export interface DashboardMetrics {
+  total: number;
+  pending: number;
+  incoming: number;
+  outgoing: number;
+}
+
+export interface ActivityPoint {
+  label: string;
+  value: number;
   date: string;
 }
