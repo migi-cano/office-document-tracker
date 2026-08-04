@@ -7,6 +7,14 @@ export type RootStackParamList = {
   MainTabs: NavigatorScreenParams<MainTabParamList>;
 
   Notifications: undefined;
+
+  UserManagement: undefined;
+
+  AddUser: undefined;
+
+  EditUser: {
+    userId: string;
+  };
 };
 
 export type DocumentsStackParamList = {

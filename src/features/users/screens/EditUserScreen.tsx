@@ -1,21 +1,22 @@
 import {
-  AppHeader,
   SafeScreen,
   ScreenContainer,
+  AppHeader,
 } from "../../../components/layout";
 
-import LoginForm from "../components/LoginForm";
+import { AppText } from "../../../components/common";
 
-export default function LoginScreen() {
+export default function EditUserScreen() {
   return (
     <SafeScreen>
       <ScreenContainer>
         <AppHeader
-          title="Welcome Back"
-          subtitle="Sign in to continue"
+          title="Edit User"
         />
 
-        <LoginForm />
+        <AppText>
+          Edit User Screen
+        </AppText>
       </ScreenContainer>
     </SafeScreen>
   );

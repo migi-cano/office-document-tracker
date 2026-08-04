@@ -17,12 +17,7 @@ export function useLogin() {
 
       console.log("Login Response:", response);
 
-      signIn({
-        id: "1",
-        username: data.username,
-        name: "Miguel Cano",
-        role: "Administrator",
-      });
+      signIn(response.user);
 
       return response;
     } catch (error) {

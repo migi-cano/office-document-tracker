@@ -1,29 +1,52 @@
-import { LoginRequest, LoginResponse } from "../types/auth.types";
+import { supabase } from "../../../lib/supabase";
+import { userService } from "../../users/services/user.service";
+
+import {
+  LoginRequest,
+  LoginResponse,
+} from "../types/auth.types";
 
 export const authService = {
   async login(
-    credentials: LoginRequest
-  ): Promise<LoginResponse> {
+  credentials: LoginRequest
+): Promise<LoginResponse> {
 
-    console.log("Logging in...", credentials);
+  const { data, error } =
+    await supabase.auth.signInWithPassword({
+      email: credentials.username,
+      password: credentials.password,
+      
+    });
+    console.log("Auth User ID:", data.user?.id);
+    console.log("Auth Email:", data.user?.email);
 
-    await new Promise(resolve => setTimeout(resolve, 1500));
+  if (error) {
+    throw error;
+  }
+
+  if (!data.user) {
+    throw new Error("User not found.");
+  }
+
+  const profile =
+    await userService.getCurrentUser(
+      data.user.id
+    );
+    console.log("Loaded Profile:", profile);
 
     return {
-      accessToken: "sample-access-token",
-      refreshToken: "sample-refresh-token",
+    accessToken:
+      data.session?.access_token ?? "",
 
-      user: {
-        id: "1",
-        username: credentials.username,
-        firstName: "Juan",
-        lastName: "Dela Cruz",
-        email: "juan@example.com",
+    refreshToken:
+      data.session?.refresh_token ?? "",
 
-        departmentId: "admin",
-        role: "Admin",
-        isActive: true,
-      },
-    };
-  },
-};
+    user: profile,
+  };
+  
+},
+
+async logout() {
+  await supabase.auth.signOut();
+},
+}
