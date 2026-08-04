@@ -34,4 +34,23 @@ leftContent: {
     alignItems: "center",
     marginLeft: 16,
   },
+
+  badge: {
+  position: "absolute",
+  top: -4,
+  right: -4,
+  minWidth: 18,
+  height: 18,
+  borderRadius: 9,
+  backgroundColor: "#EF4444",
+  justifyContent: "center",
+  alignItems: "center",
+  paddingHorizontal: 4,
+},
+
+badgeText: {
+  color: "#FFFFFF",
+  fontSize: 10,
+  fontWeight: "700",
+},
 });

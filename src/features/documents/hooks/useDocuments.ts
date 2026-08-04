@@ -9,6 +9,7 @@ export function useDocuments(search: string) {
   const [loading, setLoading] = useState(true);
 
   const loadDocuments = useCallback(async () => {
+    console.log("Loading documents...");
     setLoading(true);
 
     try {

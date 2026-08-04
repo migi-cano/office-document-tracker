@@ -18,3 +18,9 @@ export interface ActivityPoint {
   value: number;
   date: string;
 }
+
+export interface TodaySummary {
+  receivedToday: number;
+  releasedToday: number;
+  pending: number;
+}

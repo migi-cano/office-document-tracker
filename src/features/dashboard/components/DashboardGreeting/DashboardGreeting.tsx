@@ -7,8 +7,9 @@ import { DashboardGreetingProps } from "./DashboardGreeting.types";
 import { styles } from "./DashboardGreeting.styles";
 
 export default function DashboardGreeting({
-  name,
   greeting,
+  name,
+  unreadCount,
   onNotificationPress,
 }: DashboardGreetingProps) {
   return (
@@ -24,15 +25,23 @@ export default function DashboardGreeting({
       </View>
 
       <Pressable
-        style={styles.notificationButton}
-        onPress={onNotificationPress}
-      >
-        <Ionicons
-          name="notifications-outline"
-          size={22}
-          color="#111827"
-        />
-      </Pressable>
+          style={styles.notificationButton}
+          onPress={onNotificationPress}
+        >
+          <Ionicons
+            name="notifications-outline"
+            size={22}
+            color="#111827"
+          />
+
+          {!!unreadCount && (
+            <View style={styles.badge}>
+              <AppText style={styles.badgeText}>
+                {unreadCount > 99 ? "99+" : unreadCount}
+              </AppText>
+            </View>
+          )}
+        </Pressable>
     </View>
   );
 }

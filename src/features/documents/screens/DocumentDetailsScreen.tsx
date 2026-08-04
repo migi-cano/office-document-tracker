@@ -34,6 +34,13 @@ import {
 import { useDocumentHistory } from "../history";
 import { styles } from "./DocumentDetailsScreen.styles";
 import { View } from "react-native";
+import {
+  DocumentHero,
+  DocumentInformation,
+  DocumentRoute,
+  DocumentPersonnel,
+} from "../components";
+import { Pressable } from "react-native";
 
 type RouteProps = RouteProp<
   DocumentsStackParamList,
@@ -212,46 +219,16 @@ async function handleStatusUpdate() {
 
           <AppHeader title="Document Details" />
 
-          <View style={styles.section}>
-             <AppText
-                variant="heading"
-                style={styles.sectionTitle}
-              >
-                Document Information
-              </AppText>
+          <DocumentHero document={document} />
 
-              <DetailRow
-                label="Document Type"
-                value={document.documentType}
-              />
-
-              <DetailRow
-                label="Direction"
-                value={document.direction === "IN" ? "Incoming" : "Outgoing"}
-              />
-
-              <DetailRow
-                label="Title"
-                value={document.title}
-              />
-
-              <DetailRow
-                label="Subject"
-                value={document.subject}
-              />
-
-              <DetailRow
-                label="Status"
-                value={document.status}
-              />
-
-              <DetailRow
-                label="Date"
-                value={formatDateTime(document.documentDate)}
-              />
-            </View>
+          <DocumentInformation document={document} />
           
-            {/* Scanned Document */}
+           
+
+            <DocumentRoute document={document} />
+            <DocumentPersonnel document={document} />
+
+             {/* Scanned Document */}
             {imageUrl && (
               <View style={styles.section}>
                 <AppText
@@ -261,59 +238,21 @@ async function handleStatusUpdate() {
                   Scanned Document
                 </AppText>
 
-                <Image
-                  source={{ uri: imageUrl }}
-                  resizeMode="contain"
-                  style={styles.image}
-                />
+                <Pressable
+                  onPress={() =>
+                    navigation.navigate("DocumentImage", {
+                      imageUrl,
+                    })
+                  }
+                >
+                  <Image
+                    source={{ uri: imageUrl }}
+                    resizeMode="contain"
+                    style={styles.image}
+                  />
+                </Pressable>
               </View>
             )}
-
-            {/* Additional Information */}
-            <View style={styles.section}>
-              <AppText
-                variant="heading"
-                style={styles.sectionTitle}
-              >
-                Additional Information
-              </AppText>
-
-              <DetailRow
-                label="Tracking Number"
-                value={document.trackingNumber}
-              />
-
-              {document.direction === "IN" ? (
-                <>
-                  <DetailRow
-                    label="Department From"
-                    value={document.departmentFrom ?? "-"}
-                  />
-
-                  <DetailRow
-                    label="Received By"
-                    value={document.receivedBy ?? "-"}
-                  />
-                </>
-              ) : (
-                <>
-                  <DetailRow
-                    label="Destination"
-                    value={document.destination ?? "-"}
-                  />
-
-                  <DetailRow
-                    label="Processed By"
-                    value={document.processedBy ?? "-"}
-                  />
-                </>
-              )}
-
-              <DetailRow
-                label="Remarks"
-                value={document.remarks ?? "-"}
-              />
-            </View>
 
             {/* Actions */}
             <View style={styles.section}>
@@ -356,8 +295,11 @@ async function handleStatusUpdate() {
                 data={history}
                 keyExtractor={(item) => item.id}
                 scrollEnabled={false}
-                renderItem={({ item }) => (
-                  <HistoryItem history={item} />
+                renderItem={({ item, index }) => (
+                  <HistoryItem
+                    history={item}
+                    isLast={index === history.length - 1}
+                  />
                 )}
               />
             </View>

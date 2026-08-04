@@ -132,18 +132,63 @@ class DashboardService {
       metrics,
       activity,
       recentDocuments,
+      todaySummary,
     ] = await Promise.all([
       this.getMetrics(),
       this.getActivityOverview(),
       this.getRecentDocuments(),
+      this.getTodaySummary(),
     ]);
-
     return {
       metrics,
       activity,
       recentDocuments,
+      todaySummary,
     };
   }
+
+          async getTodaySummary() {
+          const today = dayjs().format("YYYY-MM-DD");
+
+          const { data, error } = await supabase
+            .from("documents")
+            .select("status, created_at")
+            .gte("created_at", `${today}T00:00:00`)
+            .lte("created_at", `${today}T23:59:59`);
+
+          if (error) {
+            throw error;
+          }
+
+          let receivedToday = 0;
+          let releasedToday = 0;
+          let pending = 0;
+
+          data.forEach((document) => {
+            switch (document.status?.trim().toUpperCase()) {
+              case "RECEIVED":
+                receivedToday++;
+                break;
+
+              case "RELEASED":
+                releasedToday++;
+                break;
+
+              case "PENDING":
+                pending++;
+                break;
+            }
+          });
+
+          return {
+            receivedToday,
+            releasedToday,
+            pending,
+          };
+        }
+
 }
+
+
 
 export default new DashboardService();

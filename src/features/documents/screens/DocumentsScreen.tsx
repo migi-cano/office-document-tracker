@@ -28,28 +28,32 @@ import { DocumentsStackParamList } from "../../../navigation/navigation.types";
 import { DocumentStatus } from "../types/document.types";
 import { useNavigation} from "@react-navigation/native";
 import { DocumentFilter } from "../types/document-filter.types";
+import { useRealtimeDocuments } from "../../../hooks/useRealtimeDocuments";
 
 type DocumentsNavigationProp =
   NativeStackNavigationProp<DocumentsStackParamList>;
 
 
 export default function DocumentsScreen() {
-const navigation = useNavigation<DocumentsNavigationProp>();
+  const navigation =
+    useNavigation<DocumentsNavigationProp>();
 
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounce(search);
 
+  const [filter, setFilter] =
+    useState<DocumentFilter>("ALL");
 
-const [filter, setFilter] = useState<DocumentFilter>("ALL");
-
-    const [filterVisible, setFilterVisible] =
-  useState(false);
+  const [filterVisible, setFilterVisible] =
+    useState(false);
 
   const {
     documents,
     loading,
     refresh,
   } = useDocuments(debouncedSearch);
+
+  useRealtimeDocuments(refresh);
 
 
   // Filter documents

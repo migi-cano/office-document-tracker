@@ -4,41 +4,47 @@ import { AppText } from "../../common";
 
 import { styles } from "./HistoryItem.styles";
 import { HistoryItemProps } from "./HistoryItem.types";
-import {
-  formatDateTime,
-} from "../../../utils/date";
+import { formatDateTime } from "../../../utils/date";
 
 export default function HistoryItem({
   history,
+  isLast,
 }: HistoryItemProps) {
   return (
-    <View style={styles.container}>
-      <AppText variant="heading">
-        {history.action}
-      </AppText>
+    <View style={styles.row}>
+      <View style={styles.timeline}>
+        <View style={styles.dot} />
+        {!isLast && <View style={styles.line} />}
+      </View>
 
-      <AppText variant="caption">
-        {formatDateTime(history.createdAt)}
-      </AppText>
+      <View style={styles.card}>
+        <AppText style={styles.action}>
+          {history.action}
+        </AppText>
 
-      {history.oldStatus &&
-        history.newStatus && (
-          <AppText variant="body">
-            {history.oldStatus} → {history.newStatus}
+        {history.oldStatus &&
+          history.newStatus && (
+            <AppText style={styles.status}>
+              {history.oldStatus} → {history.newStatus}
+            </AppText>
+          )}
+
+        {history.department && (
+          <AppText style={styles.meta}>
+            Department: {history.department}
           </AppText>
         )}
 
-      {history.department && (
-        <AppText variant="caption">
-          Department: {history.department}
-        </AppText>
-      )}
+        {history.remarks && (
+          <AppText style={styles.meta}>
+            {history.remarks}
+          </AppText>
+        )}
 
-      {history.remarks && (
-        <AppText variant="caption">
-          {history.remarks}
+        <AppText style={styles.date}>
+          {formatDateTime(history.createdAt)}
         </AppText>
-      )}
+      </View>
     </View>
   );
 }

@@ -4,6 +4,7 @@ import {
 } from "../types/document.types";
 import { supabase } from "../../../lib/supabase";
 import { documentHistoryService, DocumentHistoryAction } from "../history";
+import notificationService from "../../notifications/services/notification.service";
 
 const toDocument = (row: any): Document => ({
   id: row.id,
@@ -116,6 +117,17 @@ const { data, error } = await query;
     }
 
     const created = toDocument(data);
+    
+    await notificationService.createNotification({
+      title:
+        created.direction === "IN"
+          ? "New Incoming Document"
+          : "New Outgoing Document",
+
+      message: `${created.title} has been created.`,
+
+      documentId: created.id,
+    });
 
     await documentHistoryService.addHistory({
       documentId: created.id,
@@ -176,7 +188,14 @@ const { data, error } = await query;
   }
 
   const updated = toDocument(data);
-
+ 
+  if (updated) {
+  await notificationService.createNotification({
+    title: `Document ${status}`,
+    message: `${updated.title} is now ${status}.`,
+    documentId: updated.id,
+  });
+}
   await documentHistoryService.addHistory({
     documentId: updated.id,
     action: DocumentHistoryAction.DOCUMENT_UPDATED,
@@ -203,6 +222,12 @@ const { data, error } = await query;
     return false;
   }
 
+  await notificationService.createNotification({
+  title: "Document Deleted",
+  message: `${current.title} has been deleted.`,
+  documentId: current.id,
+});
+
   await documentHistoryService.addHistory({
     documentId: current.id,
     action: DocumentHistoryAction.DOCUMENT_DELETED,
@@ -228,6 +253,14 @@ const { data, error } = await query;
   documentId: string,
   status: DocumentStatus
 ) {
+
+  const titleMap: Record<DocumentStatus, string> = {
+  PENDING: "Document Pending",
+  RELEASED: "Document Released",
+  RECEIVED: "Document Received",
+  COMPLETED: "Document Completed",
+};
+
   const { error } = await supabase
     .from("documents")
     .update({
@@ -240,12 +273,22 @@ const { data, error } = await query;
     throw error;
   }
 
+  const updated = await this.getDocumentById(documentId);
+
+  if (updated) {
+    await notificationService.createNotification({
+      title: titleMap[status],
+      message: `${updated.title} is now ${status.toLowerCase()}.`,
+      documentId: updated.id,
+    });
+  }
+
   await documentHistoryService.addHistory({
     documentId,
     action: `Status updated to ${status}`,
   });
 
-  return this.getDocumentById(documentId);
+  return updated;
 }
 }
 export const documentService = new DocumentService();

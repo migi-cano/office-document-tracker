@@ -2,11 +2,11 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons";
 
 import DashboardScreen from "../features/dashboard/screens/DashboardScreen";
-import DocumentsScreen from "../features/documents/screens/DocumentsScreen";
-import ScannerScreen from "../features/scanner/screens/ScannerScreen";
-import UsersScreen from "../features/users/screens/UsersScreen";
-import SettingsScreen from "../features/settings/screens/SettingsScreen";
 import DocumentsNavigator from "./DocumentsNavigator";
+import ScannerScreen from "../features/scanner/screens/ScannerScreen";
+import ReportsScreen from "../features/reports/screens/ReportsScreen";
+import SettingsScreen from "../features/settings/screens/SettingsScreen";
+
 import { MainTabParamList } from "./navigation.types";
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
@@ -33,8 +33,8 @@ export default function MainTabNavigator() {
               iconName = "scan";
               break;
 
-            case "Users":
-              iconName = "people";
+            case "Reports":
+              iconName = "bar-chart";
               break;
 
             case "Settings":
@@ -60,15 +60,16 @@ export default function MainTabNavigator() {
       <Tab.Screen
         name="Documents"
         component={DocumentsNavigator}
-        />
+      />
+
       <Tab.Screen
         name="Scanner"
         component={ScannerScreen}
       />
 
       <Tab.Screen
-        name="Users"
-        component={UsersScreen}
+        name="Reports"
+        component={ReportsScreen}
       />
 
       <Tab.Screen

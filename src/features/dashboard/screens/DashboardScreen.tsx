@@ -10,7 +10,8 @@ import {
   DashboardGreeting,
   DashboardMetricGrid,
   DashboardActivityChart,
-  RecentDocumentsSection
+  RecentDocumentsSection,
+  DashboardTodaySummary
 } from "../components";
 import { useDashboard } from "../hooks";
 import {
@@ -19,18 +20,47 @@ import {
 import {
   MainTabParamList,
 } from "../../../navigation/navigation.types";
+import { useNotifications } from "../../notifications/hooks/useNotifications";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { RootStackParamList } from "../../../navigation/navigation.types";
+import { useState } from "react";
+import { NotificationPopover } from "../../notifications/components";
+import { useRealtimeDocuments } from "../../../hooks/useRealtimeDocuments";
+
+
 
 type Props = BottomTabScreenProps<MainTabParamList, "Dashboard">;
 
 
 
 export default function DashboardScreen({ navigation }: Props) {
+
+  const dashboard = useDashboard();
+
+useRealtimeDocuments(() => {
+    dashboard.refresh();
+});
+  const rootNavigation =
+  useNavigation<
+    NativeStackNavigationProp<RootStackParamList>
+  >();
   const {
-    metrics,
-    activity,
-    recentDocuments,
-    loading,
-  } = useDashboard();
+  metrics,
+  activity,
+  recentDocuments,
+  todaySummary,
+  loading,
+} = useDashboard();
+
+const [showNotifications, setShowNotifications] =
+  useState(false);
+
+const {
+  notifications,
+  unreadCount,
+  markAsRead,
+} = useNotifications();
 
   
 
@@ -49,14 +79,21 @@ export default function DashboardScreen({ navigation }: Props) {
         >
           <View style={styles.content}>
             <DashboardGreeting
-                greeting="Good Morning"
-                name="Beluga"
-                onNotificationPress={() => {
-                  // TODO: Navigate to notifications
-                }}
-              />
+              greeting="Good Morning"
+              name="Beluga"
+              unreadCount={unreadCount}
+              onNotificationPress={() =>
+                setShowNotifications(true)
+              }
+            />
 
               <DashboardMetricGrid metrics={metrics} />
+
+              <DashboardTodaySummary
+                receivedToday={todaySummary.receivedToday}
+                releasedToday={todaySummary.releasedToday}
+                pending={todaySummary.pending}
+              />
 
               <DashboardActivityChart
                   data={activity}
@@ -78,6 +115,31 @@ export default function DashboardScreen({ navigation }: Props) {
                 })
               }
             />
+            <NotificationPopover
+                visible={showNotifications}
+                notifications={notifications.slice(0, 5)}
+                unreadCount={unreadCount}
+                onClose={() => setShowNotifications(false)}
+                onViewAll={() => {
+                  setShowNotifications(false);
+
+                  rootNavigation.navigate("Notifications");
+                }}
+                onPressNotification={async (notification) => {
+                  await markAsRead(notification.id);
+
+                  setShowNotifications(false);
+
+                  if (notification.documentId) {
+                    navigation.navigate("Documents", {
+                      screen: "DocumentDetails",
+                      params: {
+                        documentId: notification.documentId,
+                      },
+                    });
+                  }
+                }}
+              />
           </View>
         </ScrollableScreen>
       </View>

@@ -3,36 +3,43 @@ import { AiDocumentAnalysis } from "../features/documents/types";
 
 export type RootStackParamList = {
   Auth: undefined;
-  Main: undefined;
+
+  MainTabs: NavigatorScreenParams<MainTabParamList>;
+
+  Notifications: undefined;
 };
 
 export type DocumentsStackParamList = {
-DocumentsList: undefined;
+  DocumentsList: undefined;
 
- DocumentPreview: {
+  DocumentPreview: {
     imageUri: string;
     ocrText: string;
     analysis: AiDocumentAnalysis;
   };
 
- ReceiveDocument: {
+  ReceiveDocument: {
     imageUri: string;
     ocrText: string;
     analysis: AiDocumentAnalysis;
-}
+  };
 
- OutgoingDocument: {
+  OutgoingDocument: {
     analysis: AiDocumentAnalysis;
     ocrText: string;
     imageUri: string;
   };
 
- DocumentDetails: {
+  DocumentDetails: {
     documentId: string;
   };
 
   EditDocument: {
     documentId: string;
+  };
+
+  DocumentImage: {
+    imageUrl: string;
   };
 };
 
@@ -42,6 +49,8 @@ export type MainTabParamList = {
   Documents: NavigatorScreenParams<DocumentsStackParamList>;
 
   Scanner: undefined;
-  Users: undefined;
+
+  Reports: undefined;
+
   Settings: undefined;
 };

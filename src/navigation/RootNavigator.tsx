@@ -3,7 +3,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { useAuth } from "../providers/AuthProvider";
 
 import AuthNavigator from "./AuthNavigator";
-import MainTabNavigator from "./MainTabNavigator";
+import RootStackNavigator from "./RootStackNavigator";
 
 export default function RootNavigator() {
   const { user } = useAuth();
@@ -11,7 +11,7 @@ export default function RootNavigator() {
   return (
     <NavigationContainer>
       {user ? (
-        <MainTabNavigator />
+        <RootStackNavigator />
       ) : (
         <AuthNavigator />
       )}

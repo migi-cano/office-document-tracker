@@ -5,6 +5,7 @@ import { dashboardService } from "../services";
 import {
   ActivityPoint,
   DashboardMetric,
+  TodaySummary,
 } from "../types/dashboard.types";
 import { useFocusEffect } from "@react-navigation/native";
 import { Document } from "../../documents/types/document.types";
@@ -14,12 +15,17 @@ export function useDashboard() {
   const [loading, setLoading] = useState(true);
   const [activity, setActivity] = useState<ActivityPoint[]>([]);
   const [recentDocuments, setRecentDocuments] = useState<Document[]>([]);
-
+  const [todaySummary, setTodaySummary] = useState<TodaySummary>({
+        receivedToday: 0,
+        releasedToday: 0,
+        pending: 0,
+      });
   const loadDashboard = useCallback(async () => {
     try {
       setLoading(true);
 
       const data = await dashboardService.getDashboardData();
+      
 
       setMetrics([
               {
@@ -45,6 +51,7 @@ export function useDashboard() {
             ]);
 
             setActivity(data.activity);
+            setTodaySummary(data.todaySummary);
             setRecentDocuments(data.recentDocuments);
 
     } catch (error) {
@@ -61,10 +68,11 @@ export function useDashboard() {
 );
 
   return {
-    metrics,
-    activity,
-    recentDocuments,
-    loading,
-    refresh: loadDashboard,
-  };
+  metrics,
+  activity,
+  recentDocuments,
+  todaySummary,
+  loading,
+  refresh: loadDashboard,
+};
 }

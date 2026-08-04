@@ -8,6 +8,7 @@ import { DocumentsStackParamList } from "./navigation.types";
 import EditDocumentScreen from "../features/documents/screens/EditDocumentScreen";
 import OutgoingDocumentScreen from "../features/documents/screens/OutgoingDocumentScreen";
 import DocumentPreviewScreen from "../features/documents/screens/DocumentPreviewScreen";
+import DocumentImageScreen from "../features/documents/screens/DocumentImageScreen";
 
 const Stack = createNativeStackNavigator<DocumentsStackParamList>();
 
@@ -43,6 +44,11 @@ export default function DocumentsNavigator() {
     name="EditDocument"
     component={EditDocumentScreen}
   />
+
+  <Stack.Screen
+  name="DocumentImage"
+  component={DocumentImageScreen}
+/>
 </Stack.Navigator>
     
   );
