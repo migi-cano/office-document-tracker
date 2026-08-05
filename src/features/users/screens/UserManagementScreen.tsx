@@ -1,27 +1,34 @@
-import { FlatList } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { FlatList, Pressable, View } from "react-native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-
+import {
+  useNavigation,
+  useFocusEffect,
+} from "@react-navigation/native";
 import {
   SafeScreen,
   ScreenContainer,
   AppHeader,
 } from "../../../components/layout";
-
 import {
   AppButton,
   AppCard,
   AppText,
 } from "../../../components/common";
-
 import { RootStackParamList } from "../../../navigation/navigation.types";
 import { useUsers } from "../hooks/useUsers";
+import { useCallback, useMemo, useState } from "react";
+import { Ionicons } from "@expo/vector-icons";
+import StatusBadge from "../../../components/common/StatusBadge";
+import AppInput from "../../../components/common/AppInput";
+import { UserCard } from "../components/UserCard";
+
 
 type NavigationProp =
   NativeStackNavigationProp<RootStackParamList>;
 
 export default function UserManagementScreen() {
   const navigation = useNavigation<NavigationProp>();
+  const [search, setSearch] = useState("");
 
   const {
     users,
@@ -29,14 +36,39 @@ export default function UserManagementScreen() {
     refresh,
   } = useUsers();
 
+  const filteredUsers = useMemo(() => {
+  const keyword = search.trim().toLowerCase();
+
+  if (!keyword) {
+    return users;
+  }
+
+  return users.filter((user) => {
+    const fullName =
+      `${user.first_name} ${user.last_name}`.toLowerCase();
+
+    return (
+      fullName.includes(keyword) ||
+      user.email.toLowerCase().includes(keyword)
+    );
+  });
+}, [users, search]);
+
+  useFocusEffect(
+  useCallback(() => {
+    refresh();
+  }, [refresh])
+);
+
   return (
     <SafeScreen>
       <ScreenContainer>
 
         <AppHeader
-          title={`Users (${users.length})`}
+          title={`Users (${filteredUsers.length})`}
           subtitle="Manage system users"
         />
+
 
         <AppButton
           title="+ Add User"
@@ -45,35 +77,58 @@ export default function UserManagementScreen() {
           }
         />
 
+        <AppInput
+        placeholder="Search by name or email..."
+        value={search}
+        onChangeText={setSearch}
+        style={{
+          marginTop: 12,
+          marginBottom: 8,
+        }}
+      />
+
         <FlatList
-          data={users}
+          data={filteredUsers}
           keyExtractor={(item) => item.id}
           refreshing={loading}
           onRefresh={refresh}
+          contentContainerStyle={{
+            paddingBottom: 24,
+          }}
+          ListEmptyComponent={
+                <View
+                  style={{
+                    alignItems: "center",
+                    paddingVertical: 40,
+                  }}
+                >
+                  <Ionicons
+                    name="people-outline"
+                    size={42}
+                    color="#D1D5DB"
+                  />
+
+                  <AppText
+                    style={{
+                      marginTop: 12,
+                      color: "#6B7280",
+                    }}
+                  >
+                    No users found.
+                  </AppText>
+                </View>
+              }
+          
           renderItem={({ item }) => (
-            <AppCard
-              style={{
-                marginTop: 12,
-              }}
-            >
-              <AppText
-                style={{
-                  fontWeight: "700",
-                  fontSize: 16,
-                }}
-              >
-                {item.first_name} {item.last_name}
-              </AppText>
-
-              <AppText>
-                {item.email}
-              </AppText>
-
-              <AppText>
-                {item.role}
-              </AppText>
-            </AppCard>
-          )}
+              <UserCard
+                user={item}
+                onPress={() =>
+                  navigation.navigate("EditUser", {
+                    userId: item.id,
+                  })
+                }
+              />
+            )}
         />
 
       </ScreenContainer>

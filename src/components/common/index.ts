@@ -4,3 +4,4 @@ export { default as AppInput } from "./AppInput";
 export { default as AppText } from "./AppText";
 export { default as EmptyState } from "./EmptyState";
 export { default as AppSelect } from "./AppSelect";
+export { default as StatusBadge } from "./StatusBadge";

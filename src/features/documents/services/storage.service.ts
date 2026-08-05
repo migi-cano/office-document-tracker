@@ -59,14 +59,26 @@ class StorageService {
   }
 
   async getSignedUrl(path: string) {
-    const { data, error } = await supabase.storage
+  const { data: files, error: listError } =
+    await supabase.storage
+      .from("documents")
+      .list();
+
+  console.log("Files:", files);
+  console.log("List Error:", listError);
+
+  const { data, error } =
+    await supabase.storage
       .from("documents")
       .createSignedUrl(path, 3600);
 
-    if (error) throw error;
+  console.log("Signed URL:", data);
+  console.log("Signed URL Error:", error);
 
-    return data.signedUrl;
-  }
+  if (error) throw error;
+
+  return data.signedUrl;
+}
 }
 
 export const storageService = new StorageService();

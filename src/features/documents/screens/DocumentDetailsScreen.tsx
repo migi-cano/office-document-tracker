@@ -92,9 +92,13 @@ export default function DocumentDetailsScreen() {
         }
 
         try {
-          const url = await storageService.getSignedUrl(
-            document.imagePath
-          );
+          await new Promise((resolve) =>
+  setTimeout(resolve, 100)
+);
+
+    const url = await storageService.getSignedUrl(
+      document.imagePath
+    );
 
           setImageUrl(url);
         } catch (error) {
