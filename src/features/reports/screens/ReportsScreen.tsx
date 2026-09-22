@@ -2,48 +2,78 @@ import { StatusBar } from "expo-status-bar";
 import { View } from "react-native";
 
 import {
-  AppHeader,
   SafeScreen,
   ScrollableScreen,
 } from "../../../components/layout";
 
-import { AppText } from "../../../components/common";
-
-import { styles } from "./ReportsScreen.styles";
+import {
+  ReportActivity,
+  ReportDirection,
+  ReportDocumentTypes,
+  ReportFilter,
+  ReportOverview,
+  ReportProcessing,
+  ReportStatusDistribution,
+  ReportTraffic,
+  ReportsHeader,
+} from "../components";
 
 import { useReports } from "../hooks/useReports";
+import { styles } from "./ReportsScreen.styles";
 
 export default function ReportsScreen() {
-  const { summary } = useReports();
+  const {
+  period,
+  setPeriod,
+  summary,
+  documentTypes,
+  departments,
+  monthlyActivity,
+} = useReports();
 
   return (
-    <SafeScreen>
-      <StatusBar style="dark" />
+    <SafeScreen backgroundColor="#0D1233">
+      <StatusBar style="light" />
 
-      <AppHeader
+      <ReportsHeader
         title="Reports"
         subtitle="Office Document Tracker"
       />
 
-      <ScrollableScreen>
-        <View style={styles.content}>
-          <AppText>
-            Incoming: {summary.incoming}
-          </AppText>
+      <View style={styles.container}>
+        <ScrollableScreen showsVerticalScrollIndicator={false}>
+          <View style={styles.content}>
+            <ReportFilter
+              value={period}
+              onChange={setPeriod}
+            />
 
-          <AppText>
-            Outgoing: {summary.outgoing}
-          </AppText>
+            <ReportOverview summary={summary} />
 
-          <AppText>
-            Pending: {summary.pending}
-          </AppText>
+            <View style={styles.graphRow}>
+              <ReportDirection
+                summary={summary}
+              />
 
-          <AppText>
-            Completed: {summary.completed}
-          </AppText>
-        </View>
-      </ScrollableScreen>
+              <ReportProcessing
+                summary={summary}
+              />
+            </View>
+
+            <ReportDocumentTypes
+              documentTypes={documentTypes}
+            />
+
+            <ReportTraffic
+              departments={departments}
+            />
+
+            <ReportActivity
+              monthlyActivity={monthlyActivity}
+            />
+          </View>
+        </ScrollableScreen>
+      </View>
     </SafeScreen>
   );
 }

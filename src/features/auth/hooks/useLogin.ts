@@ -15,13 +15,10 @@ export function useLogin() {
 
       const response = await authService.login(data);
 
-      console.log("Login Response:", response);
-
       signIn(response.user);
 
       return response;
     } catch (error) {
-      console.error(error);
       throw error;
     } finally {
       setLoading(false);

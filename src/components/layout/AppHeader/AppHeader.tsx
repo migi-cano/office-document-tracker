@@ -10,7 +10,10 @@ export default function AppHeader({
 }: AppHeaderProps) {
   return (
     <View style={styles.container}>
-      <AppText variant="title">
+      <AppText
+        variant="title"
+        color="#FFFFFF"
+      >
         {title}
       </AppText>
 

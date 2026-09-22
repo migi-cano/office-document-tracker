@@ -3,10 +3,20 @@ import { StyleSheet } from "react-native";
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "#FFFFFF",
   },
 
   content: {
-    padding: 20,
-    gap: 16,
+    flex: 1,
+    backgroundColor: "#FFFFFF",
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    justifyContent: "flex-start",
   },
+
+  graphRow: {
+  flexDirection: "row",
+  gap: 12,
+  marginTop: 20,
+},
 });
