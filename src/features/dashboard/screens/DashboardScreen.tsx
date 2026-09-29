@@ -27,6 +27,7 @@ import { RootStackParamList } from "../../../navigation/navigation.types";
 import { useState } from "react";
 import { NotificationPopover } from "../../notifications/components";
 import { useRealtimeDocuments } from "../../../hooks/useRealtimeDocuments";
+import { useAuth } from "../../../providers/AuthProvider";
 
 
 
@@ -35,6 +36,15 @@ type Props = BottomTabScreenProps<MainTabParamList, "Dashboard">;
 
 
 export default function DashboardScreen({ navigation }: Props) {
+
+  const { user } = useAuth();
+   const userName = user
+    ? `${user.firstName} ${user.lastName}`
+    : "User";
+
+  const initials = user
+    ? `${user.firstName.charAt(0)}${user.lastName.charAt(0)}`.toUpperCase()
+    : "U";
 
   const dashboard = useDashboard();
 
@@ -70,7 +80,7 @@ const {
 
       <DashboardTopBar
         title="Office Document Tracker"
-        initials="JM"
+         initials={initials}
       />
 
       <View style={styles.container}>
@@ -80,7 +90,7 @@ const {
           <View style={styles.content}>
             <DashboardGreeting
               greeting="Good Morning"
-              name="Beluga"
+              name={userName}
               unreadCount={unreadCount}
               onNotificationPress={() =>
                 setShowNotifications(true)

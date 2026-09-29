@@ -4,3 +4,4 @@ export { default as DocumentHero } from "./DocumentHero";
 export { default as DocumentInformation } from "./DocumentInformation";
 export { default as DocumentRoute } from "./DocumentRoute";
 export { default as DocumentPersonnel } from "./DocumentPersonnel";
+export { default as DocumentsHeader } from "./DocumentsHeader";

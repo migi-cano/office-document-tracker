@@ -1,33 +1,48 @@
-import { FlatList, Pressable, View } from "react-native";
+import { FlatList, View } from "react-native";
+import { StatusBar } from "expo-status-bar";
+
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import {
   useNavigation,
   useFocusEffect,
 } from "@react-navigation/native";
+
 import {
   SafeScreen,
   ScreenContainer,
-  AppHeader,
 } from "../../../components/layout";
+
 import {
   AppButton,
-  AppCard,
   AppText,
 } from "../../../components/common";
+
 import { RootStackParamList } from "../../../navigation/navigation.types";
+
 import { useUsers } from "../hooks/useUsers";
-import { useCallback, useMemo, useState } from "react";
+
+import {
+  useCallback,
+  useMemo,
+  useState,
+} from "react";
+
 import { Ionicons } from "@expo/vector-icons";
-import StatusBadge from "../../../components/common/StatusBadge";
+
 import AppInput from "../../../components/common/AppInput";
 import { UserCard } from "../components/UserCard";
 
+import { useAuth } from "../../../providers/AuthProvider";
 
 type NavigationProp =
   NativeStackNavigationProp<RootStackParamList>;
 
 export default function UserManagementScreen() {
-  const navigation = useNavigation<NavigationProp>();
+  const navigation =
+    useNavigation<NavigationProp>();
+
+  const { user: currentUser } = useAuth();
+
   const [search, setSearch] = useState("");
 
   const {
@@ -36,102 +51,146 @@ export default function UserManagementScreen() {
     refresh,
   } = useUsers();
 
-  const filteredUsers = useMemo(() => {
-  const keyword = search.trim().toLowerCase();
+  /*
+   * Hide the currently logged-in account
+   * from Manage System User.
+   */
+  const manageableUsers = useMemo(() => {
+    if (!currentUser) {
+      return users;
+    }
 
-  if (!keyword) {
-    return users;
-  }
-
-  return users.filter((user) => {
-    const fullName =
-      `${user.first_name} ${user.last_name}`.toLowerCase();
-
-    return (
-      fullName.includes(keyword) ||
-      user.email.toLowerCase().includes(keyword)
+    return users.filter(
+      (user) =>
+        user.auth_id !== currentUser.authId
     );
-  });
-}, [users, search]);
+  }, [users, currentUser]);
+
+  const filteredUsers = useMemo(() => {
+    const keyword =
+      search.trim().toLowerCase();
+
+    if (!keyword) {
+      return manageableUsers;
+    }
+
+    return manageableUsers.filter((user) => {
+      const fullName =
+        `${user.first_name} ${user.last_name}`
+          .toLowerCase();
+
+      return (
+        fullName.includes(keyword) ||
+        user.email
+          .toLowerCase()
+          .includes(keyword)
+      );
+    });
+  }, [manageableUsers, search]);
 
   useFocusEffect(
-  useCallback(() => {
-    refresh();
-  }, [refresh])
-);
+    useCallback(() => {
+      refresh();
+    }, [refresh])
+  );
 
   return (
-    <SafeScreen>
-      <ScreenContainer>
+    <SafeScreen backgroundColor="#0D1233">
+      <StatusBar style="light" />
 
-        <AppHeader
-          title={`Users (${filteredUsers.length})`}
-          subtitle="Manage system users"
-        />
-
-
-        <AppButton
-          title="+ Add User"
-          onPress={() =>
-            navigation.navigate("AddUser")
-          }
-        />
-
-        <AppInput
-        placeholder="Search by name or email..."
-        value={search}
-        onChangeText={setSearch}
+      {/* Header */}
+      <View
         style={{
-          marginTop: 12,
-          marginBottom: 8,
+          paddingHorizontal: 20,
+          paddingTop: 25,
+          paddingBottom: 30,
         }}
-      />
-
-        <FlatList
-          data={filteredUsers}
-          keyExtractor={(item) => item.id}
-          refreshing={loading}
-          onRefresh={refresh}
-          contentContainerStyle={{
-            paddingBottom: 24,
+      >
+        <AppText
+          style={{
+            fontSize: 24,
+            fontWeight: "700",
+            color: "#FFFFFF",
           }}
-          ListEmptyComponent={
-                <View
+        >
+          Manage System User
+        </AppText>
+      </View>
+
+      {/* Content */}
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: "#FFFFFF",
+        }}
+      >
+        <ScreenContainer>
+
+          <AppButton
+            title="+ Add User"
+            onPress={() =>
+              navigation.navigate("AddUser")
+            }
+          />
+
+          <AppInput
+            placeholder="Search by name or email..."
+            value={search}
+            onChangeText={setSearch}
+            style={{
+              marginTop: 12,
+              marginBottom: 8,
+            }}
+          />
+
+          <FlatList
+            data={filteredUsers}
+            keyExtractor={(item) => item.id}
+            refreshing={loading}
+            onRefresh={refresh}
+            contentContainerStyle={{
+              paddingBottom: 24,
+            }}
+            ListEmptyComponent={
+              <View
+                style={{
+                  alignItems: "center",
+                  paddingVertical: 40,
+                }}
+              >
+                <Ionicons
+                  name="people-outline"
+                  size={42}
+                  color="#D1D5DB"
+                />
+
+                <AppText
                   style={{
-                    alignItems: "center",
-                    paddingVertical: 40,
+                    marginTop: 12,
+                    color: "#6B7280",
                   }}
                 >
-                  <Ionicons
-                    name="people-outline"
-                    size={42}
-                    color="#D1D5DB"
-                  />
-
-                  <AppText
-                    style={{
-                      marginTop: 12,
-                      color: "#6B7280",
-                    }}
-                  >
-                    No users found.
-                  </AppText>
-                </View>
-              }
-          
-          renderItem={({ item }) => (
+                  No users found.
+                </AppText>
+              </View>
+            }
+            renderItem={({ item }) => (
               <UserCard
                 user={item}
                 onPress={() =>
-                  navigation.navigate("EditUser", {
-                    userId: item.id,
-                  })
+                  navigation.navigate(
+                    "EditUser",
+                    {
+                      userId: item.id,
+                    }
+                  )
                 }
               />
             )}
-        />
+          />
 
-      </ScreenContainer>
+        </ScreenContainer>
+      </View>
     </SafeScreen>
   );
 }

@@ -5,6 +5,7 @@ import { AppInput, AppText } from "../../../../components/common";
 import { ReceiveDocumentFormData } from "../../validation/receiveDocument.schema";
 import { useDepartments } from "../../../departments/hooks/useDepartments";
 import AppDropdown from "../../../../components/ui/AppDropdown";
+import { useAuth } from "../../../../providers/AuthProvider";
 
 interface OutgoingFieldsProps {
   control: Control<ReceiveDocumentFormData>;
@@ -13,30 +14,34 @@ interface OutgoingFieldsProps {
 export default function OutgoingFields({
   control,
 }: OutgoingFieldsProps) {
-
   const { departments } = useDepartments();
+  const { user } = useAuth();
 
-const departmentOptions = departments.map((department) => ({
-  label: department.name,
-  value: department.name,
-}));
+  const departmentOptions = departments.map((department) => ({
+    label: department.name,
+    value: department.name,
+  }));
+
+  const processedBy = user
+    ? `${user.firstName} ${user.lastName}`
+    : "";
 
   return (
     <>
       <Controller
-            control={control}
-            name="destination"
-            render={({ field, fieldState }) => (
-              <AppDropdown
-                label="Destination"
-                placeholder="Select destination"
-                data={departmentOptions}
-                value={field.value ?? ""}
-                onChange={field.onChange}
-                error={fieldState.error?.message}
-              />
-            )}
+        control={control}
+        name="destination"
+        render={({ field, fieldState }) => (
+          <AppDropdown
+            label="Destination"
+            placeholder="Select destination"
+            data={departmentOptions}
+            value={field.value ?? ""}
+            onChange={field.onChange}
+            error={fieldState.error?.message}
           />
+        )}
+      />
 
       <Controller
         control={control}
@@ -46,7 +51,7 @@ const departmentOptions = departments.map((department) => ({
             <AppInput
               label="Processed By"
               placeholder="Enter processor"
-              value={field.value}
+              value={field.value || processedBy}
               onChangeText={field.onChange}
             />
 

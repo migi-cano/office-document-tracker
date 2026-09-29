@@ -17,6 +17,11 @@ export function useUsers() {
     }
   }, []);
 
+  const deleteUser = useCallback(async (id: string) => {
+    await userService.deleteUser(id);
+    await loadUsers();
+  }, [loadUsers]);
+
   useEffect(() => {
     loadUsers();
   }, [loadUsers]);
@@ -25,5 +30,6 @@ export function useUsers() {
     users,
     loading,
     refresh: loadUsers,
+    deleteUser,
   };
 }

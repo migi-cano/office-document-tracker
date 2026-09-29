@@ -77,6 +77,28 @@ const toDocument = (row: any): Document => ({
 
 });
 
+async function getCurrentUserName(): Promise<string> {
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser();
+
+  if (error) {
+    throw error;
+  }
+
+  if (!user) {
+    throw new Error("No authenticated user found.");
+  }
+
+  return (
+    user.user_metadata?.full_name ||
+    user.user_metadata?.name ||
+    user.email ||
+    "Unknown User"
+  );
+}
+
 class DocumentService {
   async getDocuments(search?: string): Promise<Document[]> {
     let query = supabase
@@ -253,20 +275,35 @@ const { data, error } = await query;
   documentId: string,
   status: DocumentStatus
 ) {
-
   const titleMap: Record<DocumentStatus, string> = {
-  PENDING: "Document Pending",
-  RELEASED: "Document Released",
-  RECEIVED: "Document Received",
-  COMPLETED: "Document Completed",
-};
+    PENDING: "Document Pending",
+    RELEASED: "Document Released",
+    RECEIVED: "Document Received",
+    COMPLETED: "Document Completed",
+  };
+
+  const currentUser = await getCurrentUserName();
+
+  const updateData: Record<string, any> = {
+    status,
+    updated_at: new Date().toISOString(),
+  };
+
+  if (status === "RELEASED") {
+    updateData.processed_by = currentUser;
+  }
+
+  if (status === "RECEIVED") {
+    updateData.received_by = currentUser;
+  }
+
+  if (status === "COMPLETED") {
+    updateData.processed_by = currentUser;
+  }
 
   const { error } = await supabase
     .from("documents")
-    .update({
-      status,
-      updated_at: new Date().toISOString(),
-    })
+    .update(updateData)
     .eq("id", documentId);
 
   if (error) {

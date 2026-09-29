@@ -44,4 +44,16 @@ export const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
   },
+
+  deleteButton: {
+  position: "absolute",
+  right: 16,
+  top: 16,
+  width: 40,
+  height: 40,
+  borderRadius: 20,
+  alignItems: "center",
+  justifyContent: "center",
+  backgroundColor: "#FEF2F2",
+},
 });

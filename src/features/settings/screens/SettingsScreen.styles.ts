@@ -14,10 +14,26 @@ export const styles = StyleSheet.create({
     paddingBottom: 24,
   },
 
-  pageTitle: {
-    marginBottom: 16,
-    fontSize: 18,
-    fontWeight: "700",
+  item: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 18,
+    borderBottomWidth: 1,
+    borderBottomColor: "#E5E7EB",
+  },
+
+  textContainer: {
+    marginLeft: 16,
+  },
+
+  title: {
+    fontSize: 16,
+    fontWeight: "600",
     color: "#111827",
+  },
+
+  subtitle: {
+    color: "#6B7280",
+    marginTop: 2,
   },
 });

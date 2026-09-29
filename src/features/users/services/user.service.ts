@@ -31,6 +31,11 @@ export interface UpdateUserRequest {
 }
 
 class UserService {
+  async deleteUser(id: string) {
+  const { data } = await api.delete(`/users/${id}`);
+
+  return data;
+}
   async getUserById(
   id: string
 ): Promise<UserManagement> {

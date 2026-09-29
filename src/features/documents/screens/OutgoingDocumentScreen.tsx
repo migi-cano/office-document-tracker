@@ -3,15 +3,18 @@ import {
   useRoute,
   RouteProp,
 } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { Alert, View } from "react-native";
+import { StatusBar } from "expo-status-bar";
 
 import { DocumentsStackParamList } from "../../../navigation/navigation.types";
 
 import {
-  AppHeader,
   SafeScreen,
-  ScreenContainer,
   ScrollableScreen,
 } from "../../../components/layout";
+
+import { AppText } from "../../../components/common";
 
 import DocumentForm from "../components/DocumentForm";
 
@@ -21,14 +24,11 @@ import { generateTrackingNumber } from "../utils/generateTrackingNumber";
 import { ReceiveDocumentFormData } from "../validation/receiveDocument.schema";
 import { DocumentStatus } from "../types/document.types";
 import { parseOcr } from "../utils/parseOcr";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { storageService } from "../services/storage.service";
-import { Alert } from "react-native";
 
+import { styles } from "./OutgoingDocumentScreen.styles";
 
-
-export default function ReceiveDocumentScreen() {
-  type OutgoingDocumentNavigationProp =
+type OutgoingDocumentNavigationProp =
   NativeStackNavigationProp<
     DocumentsStackParamList,
     "OutgoingDocument"
@@ -40,118 +40,171 @@ type OutgoingDocumentRouteProp =
     "OutgoingDocument"
   >;
 
-const navigation =
-  useNavigation<OutgoingDocumentNavigationProp>();
+export default function OutgoingDocumentScreen() {
+  const navigation =
+    useNavigation<OutgoingDocumentNavigationProp>();
 
-const route =
-  useRoute<OutgoingDocumentRouteProp>();
+  const route =
+    useRoute<OutgoingDocumentRouteProp>();
 
   const { analysis } = route.params;
-  
+
   const {
-  title: aiTitle,
-  subject: aiSubject,
-  documentType: aiDocumentType,
-} = analysis;
+    title: aiTitle,
+    subject: aiSubject,
+    documentType: aiDocumentType,
+  } = analysis;
 
-  const ocrText = route.params?.ocrText ?? "";
-  const imageUri = route.params?.imageUri ?? "";
+  const ocrText =
+    route.params?.ocrText ?? "";
+
+  const imageUri =
+    route.params?.imageUri ?? "";
+
   const parsed = parseOcr(ocrText);
-  console.log("=== PARSED ===");
 
+  async function handleCreate(
+    data: ReceiveDocumentFormData
+  ) {
+    try {
+      const now =
+        new Date().toISOString();
 
-async function handleCreate(
-  data: ReceiveDocumentFormData
-) {
-  try {
-    const now = new Date().toISOString();
+      let imagePath:
+        | string
+        | undefined;
 
-    let imagePath: string | undefined;
+      if (imageUri) {
+        imagePath =
+          await storageService.uploadImage(
+            imageUri
+          );
+      }
 
-    if (imageUri) {
-      imagePath = await storageService.uploadImage(imageUri);
+      await documentService.addDocument({
+        id: "",
+
+        trackingNumber:
+          generateTrackingNumber(),
+
+        direction: "OUT",
+
+        documentType:
+          data.documentType,
+
+        title:
+          data.title,
+
+        subject:
+          data.subject,
+
+        departmentFrom: "",
+
+        destination:
+          data.destination,
+
+        processedBy:
+          data.processedBy,
+
+        receivedBy: "",
+
+        status:
+          DocumentStatus.PENDING,
+
+        remarks:
+          data.remarks ?? "",
+
+        documentDate: now,
+
+        ocrText,
+
+        attachmentUrl:
+          imageUri,
+
+        createdAt: now,
+
+        updatedAt: now,
+
+        imagePath,
+      });
+
+      navigation.reset({
+        index: 0,
+        routes: [
+          {
+            name: "DocumentsList",
+          },
+        ],
+      });
+    } catch (error) {
+      console.error(
+        "Upload Error:",
+        error
+      );
+
+      Alert.alert(
+        "Upload Failed",
+        error instanceof Error
+          ? error.message
+          : JSON.stringify(error)
+      );
     }
-
-    await documentService.addDocument({
-      id: "",
-
-      trackingNumber: generateTrackingNumber(),
-
-      direction: "OUT",
-
-      documentType: data.documentType,
-
-      title: data.title,
-
-      subject: data.subject,
-
-      departmentFrom: "",
-
-      destination: data.destination,
-
-      processedBy: data.processedBy,
-
-      receivedBy: "",
-
-      status: DocumentStatus.PENDING,
-
-      remarks: data.remarks ?? "",
-
-      documentDate: now,
-
-      ocrText,
-
-      attachmentUrl: imageUri,
-
-      createdAt: now,
-
-      updatedAt: now,
-
-      imagePath,
-    });
-
-    navigation.reset({
-  index: 0,
-  routes: [
-    {
-      name: "DocumentsList",
-    },
-  ],
-});
-  } catch (error) {
-  console.error("Upload Error:", error);
-
-  Alert.alert(
-    "Upload Failed",
-    error instanceof Error ? error.message : JSON.stringify(error)
-  );
-}
-}
+  }
 
   return (
-    <SafeScreen>
-      <ScrollableScreen>
-      <ScreenContainer>
+    <SafeScreen backgroundColor="#0D1233">
+      <StatusBar style="light" />
 
+      {/* Header */}
+      <View style={styles.header}>
+        <AppText style={styles.headerTitle}>
+          Outgoing Document
+        </AppText>
+      </View>
 
-        <AppHeader
-          title="Outgoing Document"
-          subtitle="Create a new outgoing document"
-        />
-      
-        <DocumentForm
-            direction="OUT"
-            initialValues={{
-            title: aiTitle || parsed.title,
-            subject: aiSubject || parsed.subject,
-            documentType: aiDocumentType,
-        }}
-            submitButtonTitle="Save Outgoing Document"
-            onSubmit={handleCreate}
-          />
+      {/* Content */}
+      <View style={styles.container}>
+        <ScrollableScreen
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={styles.content}>
 
-      </ScreenContainer>
-      </ScrollableScreen>
+            <View style={styles.intro}>
+              <AppText style={styles.sectionTitle}>
+                Document Information
+              </AppText>
+
+              <AppText style={styles.description}>
+                Review and complete the information
+                before saving this outgoing document.
+              </AppText>
+            </View>
+
+            <View style={styles.formCard}>
+              <DocumentForm
+                direction="OUT"
+                initialValues={{
+                  title:
+                    aiTitle ||
+                    parsed.title,
+
+                  subject:
+                    aiSubject ||
+                    parsed.subject,
+
+                  documentType:
+                    aiDocumentType,
+                }}
+                submitButtonTitle="Save Outgoing Document"
+                onSubmit={handleCreate}
+              />
+            </View>
+
+            <View style={styles.bottomSpacing} />
+
+          </View>
+        </ScrollableScreen>
+      </View>
     </SafeScreen>
   );
 }

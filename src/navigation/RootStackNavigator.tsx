@@ -5,6 +5,7 @@ import { RootStackParamList } from "./navigation.types";
 import UserManagementScreen from "../features/users/screens/UserManagementScreen";
 import AddUserScreen from "../features/users/screens/AddUserScreen";
 import EditUserScreen from "../features/users/screens/EditUserScreen";
+import EditAccountScreen from "../features/settings/screens/EditAccountScreen";
 
 const Stack =
   createNativeStackNavigator<RootStackParamList>();
@@ -39,6 +40,11 @@ export default function RootStackNavigator() {
       <Stack.Screen
         name="EditUser"
         component={EditUserScreen}
+      />
+
+      <Stack.Screen
+        name="EditAccount"
+        component={EditAccountScreen}
       />
     </Stack.Navigator>
   );

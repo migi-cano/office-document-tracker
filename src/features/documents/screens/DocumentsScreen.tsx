@@ -1,24 +1,28 @@
+import { StatusBar } from "expo-status-bar";
 import {
   FlatList,
   View,
-  StyleSheet,
 } from "react-native";
 import { useMemo, useState } from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { EmptyState } from "../../../components/common";
+import { useNavigation } from "@react-navigation/native";
+
+import {
+  EmptyState,
+  AppText,
+} from "../../../components/common";
+
 import {
   FilterModal,
   DocumentToolbar,
+  DocumentsHeader,
 } from "../components";
 
+import { DocumentCard } from "../../../components/business";
+
 import {
-  DocumentCard,
-  SearchBar,
-} from "../../../components/business";
-import {
-  AppHeader,
   SafeScreen,
-  ScreenContainer,
+  ScrollableScreen,
 } from "../../../components/layout";
 
 import { useDocuments } from "../hooks/useDocuments";
@@ -26,13 +30,12 @@ import { useDebounce } from "../../../hooks/useDebounce";
 
 import { DocumentsStackParamList } from "../../../navigation/navigation.types";
 import { DocumentStatus } from "../types/document.types";
-import { useNavigation} from "@react-navigation/native";
 import { DocumentFilter } from "../types/document-filter.types";
 import { useRealtimeDocuments } from "../../../hooks/useRealtimeDocuments";
+import { styles } from "./DocumentsScreen.styles";
 
 type DocumentsNavigationProp =
   NativeStackNavigationProp<DocumentsStackParamList>;
-
 
 export default function DocumentsScreen() {
   const navigation =
@@ -55,16 +58,14 @@ export default function DocumentsScreen() {
 
   useRealtimeDocuments(refresh);
 
-
-  // Filter documents
   const filteredDocuments = useMemo(() => {
     return documents.filter((document) => {
       switch (filter) {
         case "IN":
-          return document.direction === "IN"
+          return document.direction === "IN";
 
         case "OUT":
-          return document.direction === "OUT"
+          return document.direction === "OUT";
 
         case "PENDING":
           return document.status === DocumentStatus.PENDING;
@@ -91,53 +92,67 @@ export default function DocumentsScreen() {
   }[filter];
 
   return (
-    <SafeScreen>
-      <ScreenContainer>
-        <AppHeader
-          title={`${pageTitle} (${filteredDocuments.length})`}
-          subtitle="Office Document Tracker"
-        />
+    <SafeScreen backgroundColor="#0D1233">
+      <StatusBar style="light" />
 
-       <DocumentToolbar
-            search={search}
-            onSearchChange={setSearch}
-            onFilterPress={() => setFilterVisible(true)}
-        />
+      <DocumentsHeader title="Documents" />
 
-        <FlatList
-            data={filteredDocuments}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-              <DocumentCard
-                document={item}
-                onPress={() =>
-                  navigation.navigate("DocumentDetails", {
-                    documentId: item.id,
-                  })
-                }
-              />
-            )}
-            refreshing={loading}
-            onRefresh={refresh}
-            ListEmptyComponent={
-              <EmptyState
-                title="No Documents Found"
-                description="Try searching with another keyword."
-              />
-            }
-            showsVerticalScrollIndicator={false}
-          />
+      <View style={styles.container}>
+        <ScrollableScreen
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={styles.content}>
+            <AppText style={styles.pageTitle}>
+              {pageTitle} ({filteredDocuments.length})
+            </AppText>
 
+            <DocumentToolbar
+              search={search}
+              onSearchChange={setSearch}
+              onFilterPress={() =>
+                setFilterVisible(true)
+              }
+            />
 
-          <FilterModal
-            visible={filterVisible}
-            selectedFilter={filter}
-            onSelect={setFilter}
-            onClose={() => setFilterVisible(false)}
-          />
+            <FlatList
+              data={filteredDocuments}
+              keyExtractor={(item) => item.id}
+              renderItem={({ item }) => (
+                <DocumentCard
+                  document={item}
+                  onPress={() =>
+                    navigation.navigate(
+                      "DocumentDetails",
+                      {
+                        documentId: item.id,
+                      }
+                    )
+                  }
+                />
+              )}
+              refreshing={loading}
+              onRefresh={refresh}
+              ListEmptyComponent={
+                <EmptyState
+                  title="No Documents Found"
+                  description="Try searching with another keyword."
+                />
+              }
+              scrollEnabled={false}
+              showsVerticalScrollIndicator={false}
+            />
+          </View>
+        </ScrollableScreen>
+      </View>
 
-          
-      </ScreenContainer>
+      <FilterModal
+        visible={filterVisible}
+        selectedFilter={filter}
+        onSelect={setFilter}
+        onClose={() =>
+          setFilterVisible(false)
+        }
+      />
     </SafeScreen>
   );
 }

@@ -1,15 +1,16 @@
-import { Image, View } from "react-native";
+import { Image, Pressable, View } from "react-native";
+import { StatusBar } from "expo-status-bar";
 import {
   useNavigation,
   useRoute,
   RouteProp,
 } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { Ionicons } from "@expo/vector-icons";
 
 import {
   SafeScreen,
-  ScreenContainer,
   ScrollableScreen,
-  AppHeader,
 } from "../../../components/layout";
 
 import {
@@ -18,14 +19,13 @@ import {
 } from "../../../components/common";
 
 import { DocumentsStackParamList } from "../../../navigation/navigation.types";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+
+import { styles } from "./DocumentPreviewScreen.styles";
 
 type DocumentPreviewRouteProp = RouteProp<
   DocumentsStackParamList,
   "DocumentPreview"
 >;
-
-export default function DocumentPreviewScreen() {
 
 type DocumentPreviewNavigationProp =
   NativeStackNavigationProp<
@@ -33,85 +33,225 @@ type DocumentPreviewNavigationProp =
     "DocumentPreview"
   >;
 
+export default function DocumentPreviewScreen() {
   const navigation =
-  useNavigation<DocumentPreviewNavigationProp>();
-  const route = useRoute<DocumentPreviewRouteProp>();
+    useNavigation<DocumentPreviewNavigationProp>();
 
-  const { imageUri, ocrText, analysis } = route.params;
+  const route =
+    useRoute<DocumentPreviewRouteProp>();
+
+  const {
+    imageUri,
+    ocrText,
+    analysis,
+  } = route.params;
 
   return (
-    <SafeScreen>
-      <ScrollableScreen>
-        <ScreenContainer>
+    <SafeScreen backgroundColor="#0D1233">
+      <StatusBar style="light" />
 
-          <AppHeader
-            title="Document Preview"
-            subtitle="Review the extracted information"
-          />
+      {/* Header */}
+      <View style={styles.header}>
+        <AppText style={styles.headerTitle}>
+          Document Preview
+        </AppText>
+      </View>
 
-          <Image
-            source={{ uri: imageUri }}
-            style={{
-              width: "100%",
-              height: 250,
-              borderRadius: 12,
-            }}
-            resizeMode="contain"
-          />
+      {/* Content */}
+      <View style={styles.container}>
+        <ScrollableScreen
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={styles.content}>
 
-          <View style={{ marginTop: 20 }}>
+            {/* Document Image */}
+            <View style={styles.imageCard}>
+              <Image
+                source={{ uri: imageUri }}
+                style={styles.documentImage}
+                resizeMode="contain"
+              />
+            </View>
 
-            <AppText>
-              <AppText style={{ fontWeight: "bold" }}>
-                Document Type:
-              </AppText>{" "}
-              {analysis.documentType}
-            </AppText>
+            {/* Document Information */}
+            <View style={styles.section}>
+              <AppText style={styles.sectionTitle}>
+                Extracted Information
+              </AppText>
 
-            <AppText style={{ marginTop: 10 }}>
-              <AppText style={{ fontWeight: "bold" }}>
-                Title:
-              </AppText>{" "}
-              {analysis.title}
-            </AppText>
+              <View style={styles.infoCard}>
 
-            <AppText style={{ marginTop: 10 }}>
-              <AppText style={{ fontWeight: "bold" }}>
-                Subject:
-              </AppText>{" "}
-              {analysis.subject}
-            </AppText>
+                <View style={styles.infoRow}>
+                  <View style={styles.infoIcon}>
+                    <Ionicons
+                      name="document-text-outline"
+                      size={20}
+                      color="#2563EB"
+                    />
+                  </View>
+
+                  <View style={styles.infoContent}>
+                    <AppText style={styles.infoLabel}>
+                      Document Type
+                    </AppText>
+
+                    <AppText style={styles.infoValue}>
+                      {analysis.documentType || "Not identified"}
+                    </AppText>
+                  </View>
+                </View>
+
+                <View style={styles.divider} />
+
+                <View style={styles.infoRow}>
+                  <View style={styles.infoIcon}>
+                    <Ionicons
+                      name="text-outline"
+                      size={20}
+                      color="#2563EB"
+                    />
+                  </View>
+
+                  <View style={styles.infoContent}>
+                    <AppText style={styles.infoLabel}>
+                      Title
+                    </AppText>
+
+                    <AppText style={styles.infoValue}>
+                      {analysis.title || "Not identified"}
+                    </AppText>
+                  </View>
+                </View>
+
+                <View style={styles.divider} />
+
+                <View style={styles.infoRow}>
+                  <View style={styles.infoIcon}>
+                    <Ionicons
+                      name="pricetag-outline"
+                      size={20}
+                      color="#2563EB"
+                    />
+                  </View>
+
+                  <View style={styles.infoContent}>
+                    <AppText style={styles.infoLabel}>
+                      Subject
+                    </AppText>
+
+                    <AppText style={styles.infoValue}>
+                      {analysis.subject || "Not identified"}
+                    </AppText>
+                  </View>
+                </View>
+
+              </View>
+            </View>
+
+            {/* Document Routing */}
+            <View style={styles.section}>
+              <AppText style={styles.sectionTitle}>
+                Document Routing
+              </AppText>
+
+              <AppText style={styles.sectionDescription}>
+                Select how this document will be recorded.
+              </AppText>
+
+              <View style={styles.actionCard}>
+
+                <Pressable
+                  style={({ pressed }) => [
+                    styles.actionButton,
+                    pressed && styles.actionButtonPressed,
+                  ]}
+                  onPress={() =>
+                    navigation.navigate(
+                      "ReceiveDocument",
+                      {
+                        imageUri,
+                        ocrText,
+                        analysis,
+                      }
+                    )
+                  }
+                >
+                  <View style={styles.actionIconIncoming}>
+                    <Ionicons
+                      name="arrow-down-outline"
+                      size={22}
+                      color="#2563EB"
+                    />
+                  </View>
+
+                  <View style={styles.actionContent}>
+                    <AppText style={styles.actionTitle}>
+                      Incoming Document
+                    </AppText>
+
+                    <AppText style={styles.actionDescription}>
+                      Record a document received by the office.
+                    </AppText>
+                  </View>
+
+                  <Ionicons
+                    name="chevron-forward"
+                    size={20}
+                    color="#9CA3AF"
+                  />
+                </Pressable>
+
+                <View style={styles.actionDivider} />
+
+                <Pressable
+                  style={({ pressed }) => [
+                    styles.actionButton,
+                    pressed && styles.actionButtonPressed,
+                  ]}
+                  onPress={() =>
+                    navigation.navigate(
+                      "OutgoingDocument",
+                      {
+                        imageUri,
+                        ocrText,
+                        analysis,
+                      }
+                    )
+                  }
+                >
+                  <View style={styles.actionIconOutgoing}>
+                    <Ionicons
+                      name="arrow-up-outline"
+                      size={22}
+                      color="#16A34A"
+                    />
+                  </View>
+
+                  <View style={styles.actionContent}>
+                    <AppText style={styles.actionTitle}>
+                      Outgoing Document
+                    </AppText>
+
+                    <AppText style={styles.actionDescription}>
+                      Record a document sent by the office.
+                    </AppText>
+                  </View>
+
+                  <Ionicons
+                    name="chevron-forward"
+                    size={20}
+                    color="#9CA3AF"
+                  />
+                </Pressable>
+
+              </View>
+            </View>
+
+            <View style={styles.bottomSpacing} />
 
           </View>
-
-          <View style={{ marginTop: 30 }}>
-
-            <AppButton
-            title="Incoming Document"
-            onPress={() =>
-                navigation.navigate("ReceiveDocument", {
-                imageUri,
-                ocrText,
-                analysis,
-                })
-            }
-            />
-
-            <AppButton
-            title="Outgoing Document"
-            onPress={() =>
-                navigation.navigate("OutgoingDocument", {
-                imageUri,
-                ocrText,
-                analysis,
-                })
-            }
-            />
-
-          </View>
-
-        </ScreenContainer>
-      </ScrollableScreen>
+        </ScrollableScreen>
+      </View>
     </SafeScreen>
   );
 }

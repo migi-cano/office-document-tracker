@@ -1,6 +1,6 @@
 import { StyleSheet } from "react-native";
 
-export const styles = StyleSheet.create({
+export const formScreenStyles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#FFFFFF",
@@ -14,9 +14,13 @@ export const styles = StyleSheet.create({
     paddingBottom: 24,
   },
 
-  pageTitle: {
-    marginBottom: 16,
-    fontSize: 18,
+  section: {
+    marginTop: 24,
+  },
+
+  sectionTitle: {
+    marginBottom: 14,
+    fontSize: 17,
     fontWeight: "700",
     color: "#111827",
   },

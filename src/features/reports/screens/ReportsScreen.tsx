@@ -13,7 +13,6 @@ import {
   ReportFilter,
   ReportOverview,
   ReportProcessing,
-  ReportStatusDistribution,
   ReportTraffic,
   ReportsHeader,
 } from "../components";

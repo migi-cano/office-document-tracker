@@ -3,18 +3,12 @@ import { AiDocumentAnalysis } from "../features/documents/types";
 
 export type RootStackParamList = {
   Auth: undefined;
-
   MainTabs: NavigatorScreenParams<MainTabParamList>;
-
   Notifications: undefined;
-
   UserManagement: undefined;
-
   AddUser: undefined;
-
-  EditUser: {
-    userId: string;
-  };
+  EditUser: { userId: string };
+  EditAccount: undefined;
 };
 
 export type DocumentsStackParamList = {

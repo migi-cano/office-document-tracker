@@ -31,8 +31,14 @@ export default function FilterModal({
       onRequestClose={onClose}
     >
       <View style={styles.overlay}>
-        <View style={styles.container}>
+        {/* Clickable area outside the modal */}
+        <Pressable
+          style={styles.backdrop}
+          onPress={onClose}
+        />
 
+        {/* Modal content */}
+        <View style={styles.container}>
           <Text style={styles.title}>
             Filter Documents
           </Text>
@@ -153,7 +159,6 @@ export default function FilterModal({
               Cancel
             </Text>
           </Pressable>
-
         </View>
       </View>
     </Modal>
@@ -164,6 +169,14 @@ const styles = StyleSheet.create({
   overlay: {
     flex: 1,
     justifyContent: "flex-end",
+  },
+
+  backdrop: {
+    position: "absolute",
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
     backgroundColor: "rgba(0,0,0,0.35)",
   },
 
@@ -184,9 +197,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-
     paddingVertical: 16,
-
     borderBottomWidth: 1,
     borderBottomColor: "#E5E7EB",
   },
