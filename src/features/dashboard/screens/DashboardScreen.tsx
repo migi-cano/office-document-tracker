@@ -1,5 +1,6 @@
 import { StatusBar } from "expo-status-bar";
-import { View } from "react-native";
+import { useEffect, useRef, useState } from "react";
+import { Animated, View } from "react-native";
 import {
   SafeScreen,
   ScrollableScreen,
@@ -24,7 +25,6 @@ import { useNotifications } from "../../notifications/hooks/useNotifications";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../../navigation/navigation.types";
-import { useState } from "react";
 import { NotificationPopover } from "../../notifications/components";
 import { useRealtimeDocuments } from "../../../hooks/useRealtimeDocuments";
 import { useAuth } from "../../../providers/AuthProvider";
@@ -32,6 +32,58 @@ import { useAuth } from "../../../providers/AuthProvider";
 
 
 type Props = BottomTabScreenProps<MainTabParamList, "Dashboard">;
+
+function DashboardSkeleton() {
+  const pulse = useRef(new Animated.Value(0.45)).current;
+
+  useEffect(() => {
+    const animation = Animated.loop(
+      Animated.sequence([
+        Animated.timing(pulse, {
+          toValue: 0.9,
+          duration: 1000,
+          useNativeDriver: true,
+        }),
+        Animated.timing(pulse, {
+          toValue: 0.45,
+          duration: 1000,
+          useNativeDriver: true,
+        }),
+      ])
+    );
+
+    animation.start();
+
+    return () => animation.stop();
+  }, [pulse]);
+
+  return (
+    <Animated.View style={[styles.skeleton, { opacity: pulse }]}>
+      <View style={styles.skeletonGreeting}>
+        <View style={styles.skeletonGreetingLine} />
+        <View style={styles.skeletonGreetingTitle} />
+      </View>
+
+      <View style={styles.skeletonMetrics}>
+        {Array.from({ length: 4 }).map((_, index) => (
+          <View key={index} style={styles.skeletonMetric} />
+        ))}
+      </View>
+
+      <View style={styles.skeletonSummary}>
+        {Array.from({ length: 3 }).map((_, index) => (
+          <View key={index} style={styles.skeletonSummaryItem} />
+        ))}
+      </View>
+
+      <View style={styles.skeletonChart} />
+
+      <View style={styles.skeletonSectionTitle} />
+      <View style={styles.skeletonDocument} />
+      <View style={styles.skeletonDocument} />
+    </Animated.View>
+  );
+}
 
 
 
@@ -48,20 +100,20 @@ export default function DashboardScreen({ navigation }: Props) {
 
   const dashboard = useDashboard();
 
-useRealtimeDocuments(() => {
+  useRealtimeDocuments(() => {
     dashboard.refresh();
-});
+  });
   const rootNavigation =
   useNavigation<
     NativeStackNavigationProp<RootStackParamList>
   >();
   const {
-  metrics,
-  activity,
-  recentDocuments,
-  todaySummary,
-  loading,
-} = useDashboard();
+    metrics,
+    activity,
+    recentDocuments,
+    todaySummary,
+    loading,
+  } = dashboard;
 
 const [showNotifications, setShowNotifications] =
   useState(false);
@@ -88,14 +140,18 @@ const {
           showsVerticalScrollIndicator={false}
         >
           <View style={styles.content}>
-            <DashboardGreeting
-              greeting="Good Morning"
-              name={userName}
-              unreadCount={unreadCount}
-              onNotificationPress={() =>
-                setShowNotifications(true)
-              }
-            />
+            {loading ? (
+              <DashboardSkeleton />
+            ) : (
+              <>
+                <DashboardGreeting
+                  greeting="Good Morning"
+                  name={userName}
+                  unreadCount={unreadCount}
+                  onNotificationPress={() =>
+                    setShowNotifications(true)
+                  }
+                />
 
               <DashboardMetricGrid metrics={metrics} />
 
@@ -125,7 +181,7 @@ const {
                 })
               }
             />
-            <NotificationPopover
+              <NotificationPopover
                 visible={showNotifications}
                 notifications={notifications.slice(0, 5)}
                 unreadCount={unreadCount}
@@ -150,6 +206,8 @@ const {
                   }
                 }}
               />
+              </>
+            )}
           </View>
         </ScrollableScreen>
       </View>

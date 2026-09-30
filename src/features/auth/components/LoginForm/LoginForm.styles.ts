@@ -2,56 +2,117 @@ import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
   container: {
-    width: "100%",
+    flex: 1,
+    backgroundColor: "#FFFFFF",
   },
 
   logoContainer: {
+    position: "absolute",
+    top: "50%",
+    left: 0,
+    right: 0,
+    height: 92,
     alignItems: "center",
-    marginBottom: 20,
+    justifyContent: "center",
+    zIndex: 2,
   },
 
   logo: {
-    width: 72,
-    height: 72,
-    borderRadius: 20,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#2563EB",
+    marginTop: 30,
+    width: 300,
+    height: 92,
+  },
+
+  content: {
+    flex: 1,
+    paddingTop: 136,
   },
 
   heading: {
     alignItems: "center",
-    marginBottom: 28,
+    paddingHorizontal: 16,
+    marginTop: 12,
+    marginBottom: 20,
   },
 
   title: {
-    fontSize: 28,
+    marginTop: 20,
+    fontSize: 25,
     fontWeight: "700",
-    color: "#FFFFFF",
+    color: "#202020",
     textAlign: "center",
   },
 
   subtitle: {
-    marginTop: 7,
-    maxWidth: 300,
+    marginTop: 8,
     fontSize: 14,
-    lineHeight: 20,
-    color: "#CBD5E1",
+    color: "#7A7A7A",
     textAlign: "center",
   },
 
-  card: {
-    width: "100%",
-    padding: 20,
-    borderRadius: 16,
-    backgroundColor: "#FFFFFF",
+  loginPanel: {
+    flex: 1,
+    marginTop: 40,
+    paddingHorizontal: 20,
+    paddingTop: 50,
+    backgroundColor: "#07079A",
+
+    borderTopLeftRadius: 64,
+    borderTopRightRadius: 64,
   },
 
-  passwordField: {
-    marginTop: 4,
+  field: {
+    marginBottom: 12,
+  },
+
+  label: {
+    marginBottom: 7,
+    fontSize: 13,
+    fontWeight: "500",
+    color: "#FFFFFF",
+  },
+
+  inputWrapper: {
+    position: "relative",
+    width: "100%",
+    minHeight: 48,
+  },
+
+  inputIcon: {
+    position: "absolute",
+    top: 14,
+    left: 16,
+    zIndex: 2,
+  },
+
+  input: {
+    width: "100%",
+    minHeight: 48,
+    margin: 0,
+    paddingLeft: 48,
+    paddingRight: 16,
+    paddingVertical: 10,
+
+    borderWidth: 0,
+    borderRadius: 24,
+
+    backgroundColor: "#FFFFFF",
+
+    color: "#374151",
+  },
+
+  passwordInput: {
+    paddingRight: 48,
+  },
+
+  passwordToggle: {
+    position: "absolute",
+    top: 14,
+    right: 16,
+    zIndex: 2,
   },
 
   buttonContainer: {
-    marginTop: 8,
+    marginTop: 12,
   },
 });

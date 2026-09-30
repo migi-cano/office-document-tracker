@@ -1,13 +1,18 @@
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { View } from "react-native";
+import {
+  Animated,
+  Image,
+  Pressable,
+  View,
+  useWindowDimensions,
+} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
 import AppButton from "../../../../components/common/AppButton";
 import AppInput from "../../../../components/common/AppInput";
 import { AppText } from "../../../../components/common";
-
-import { styles } from "./LoginForm.styles";
 
 import {
   loginSchema,
@@ -16,7 +21,34 @@ import {
 
 import { useLogin } from "../../hooks/useLogin";
 
+import { styles } from "./LoginForm.styles";
+
+const logo = require("../../../../../assets/images/onencr.png");
+
 export default function LoginForm() {
+  const [passwordVisible, setPasswordVisible] = useState(false);
+  const { height: screenHeight } = useWindowDimensions();
+  const logoAnimation = useRef(new Animated.Value(0)).current;
+  const formAnimation = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.sequence([
+      Animated.timing(logoAnimation, {
+        toValue: 1,
+        duration: 1000,
+        delay: 2000,
+        useNativeDriver: true,
+      }),
+      Animated.parallel([
+        Animated.timing(formAnimation, {
+          toValue: 1,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+      ]),
+    ]).start();
+  }, [formAnimation, logoAnimation]);
+
   const {
     handleSubmit,
     watch,
@@ -33,67 +65,138 @@ export default function LoginForm() {
 
   const { login, loading } = useLogin();
 
-  async function onSubmit(
-    data: LoginFormData
-  ) {
+  async function onSubmit(data: LoginFormData) {
     await login(data);
   }
 
   return (
     <View style={styles.container}>
 
-      {/* Logo / App Icon */}
-      <View style={styles.logoContainer}>
-        <View style={styles.logo}>
-          <Ionicons
-            name="documents-outline"
-            size={34}
-            color="#FFFFFF"
-          />
-        </View>
-      </View>
-
-      {/* Heading */}
-      <View style={styles.heading}>
-        <AppText style={styles.title}>
-          Welcome Back
-        </AppText>
-
-        <AppText style={styles.subtitle}>
-          Sign in to continue to your document tracker
-        </AppText>
-      </View>
-
-      {/* Login Card */}
-      <View style={styles.card}>
-
-        <AppInput
-          label="Username"
-          placeholder="Enter username"
-          value={watch("username")}
-          onChangeText={(text) =>
-            setValue("username", text, {
-              shouldValidate: true,
-            })
-          }
-          error={errors.username?.message}
+      {/* Logo */}
+      <Animated.View
+        style={[
+          styles.logoContainer,
+          {
+            transform: [
+              {
+                translateY: logoAnimation.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [-46, 24 - screenHeight / 2],
+                }),
+              },
+            ],
+          },
+        ]}
+      >
+        <Image
+          source={logo}
+          style={styles.logo}
+          resizeMode="contain"
         />
+      </Animated.View>
 
-        <View style={styles.passwordField}>
-          <AppInput
-            label="Password"
-            placeholder="Enter password"
-            secureTextEntry
-            value={watch("password")}
-            onChangeText={(text) =>
-              setValue("password", text, {
-                shouldValidate: true,
-              })
-            }
-            error={errors.password?.message}
-          />
+      <Animated.View
+        style={[
+          styles.content,
+          {
+            opacity: formAnimation,
+            transform: [
+              {
+                translateY: formAnimation.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [18, 0],
+                }),
+              },
+            ],
+          },
+        ]}
+      >
+        {/* Welcome Message */}
+        <View style={styles.heading}>
+          <AppText style={styles.title}>
+            Welcome back!
+          </AppText>
+
+          <AppText style={styles.subtitle}>
+            Enter your credentials to access your account
+          </AppText>
         </View>
 
+        {/* Login Panel */}
+        <View style={styles.loginPanel}>
+
+        {/* Username */}
+        <View style={styles.field}>
+          <AppText style={styles.label}>
+            Email Address
+          </AppText>
+
+          <View style={styles.inputWrapper}>
+            <Ionicons
+              name="mail-outline"
+              size={20}
+              color="#9CA3AF"
+              style={styles.inputIcon}
+            />
+
+            <AppInput
+              placeholder="name@company.com"
+              value={watch("username")}
+              onChangeText={(text) =>
+                setValue("username", text, {
+                  shouldValidate: true,
+                })
+              }
+              error={errors.username?.message}
+              style={styles.input}
+            />
+          </View>
+        </View>
+
+        {/* Password */}
+        <View style={styles.field}>
+          <AppText style={styles.label}>
+            Password
+          </AppText>
+
+          <View style={styles.inputWrapper}>
+            <Ionicons
+              name="lock-closed-outline"
+              size={20}
+              color="#9CA3AF"
+              style={styles.inputIcon}
+            />
+
+            <AppInput
+              placeholder="••••••••••••"
+              secureTextEntry={!passwordVisible}
+              value={watch("password")}
+              onChangeText={(text) =>
+                setValue("password", text, {
+                  shouldValidate: true,
+                })
+              }
+              error={errors.password?.message}
+              style={[styles.input, styles.passwordInput]}
+            />
+
+            <Pressable
+              accessibilityLabel={passwordVisible ? "Hide password" : "Show password"}
+              accessibilityRole="button"
+              hitSlop={8}
+              onPress={() => setPasswordVisible((visible) => !visible)}
+              style={styles.passwordToggle}
+            >
+              <Ionicons
+                name={passwordVisible ? "eye-off-outline" : "eye-outline"}
+                size={20}
+                color="#6B7280"
+              />
+            </Pressable>
+          </View>
+        </View>
+
+        {/* Login Button */}
         <View style={styles.buttonContainer}>
           <AppButton
             title="Login"
@@ -102,8 +205,8 @@ export default function LoginForm() {
           />
         </View>
 
-      </View>
-
+        </View>
+      </Animated.View>
     </View>
   );
 }
