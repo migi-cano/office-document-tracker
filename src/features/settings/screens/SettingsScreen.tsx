@@ -84,6 +84,31 @@ export default function SettingsScreen() {
               </Pressable>
             )}
 
+            {user?.role === "Admin" && (
+              <Pressable
+                style={styles.item}
+                onPress={() =>
+                  navigation.navigate("RecipientManagement")
+                }
+              >
+                <Ionicons
+                  name="qr-code-outline"
+                  size={22}
+                  color="#2563EB"
+                />
+
+                <View style={styles.textContainer}>
+                  <AppText style={styles.title}>
+                    Recipient Management
+                  </AppText>
+
+                  <AppText style={styles.subtitle}>
+                    Create and manage document recipients
+                  </AppText>
+                </View>
+              </Pressable>
+            )}
+
             <Pressable
               style={styles.item}
               onPress={() =>

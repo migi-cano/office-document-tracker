@@ -5,12 +5,16 @@ export type RootStackParamList = {
   Auth: undefined;
   MainTabs: NavigatorScreenParams<MainTabParamList>;
   Notifications: undefined;
-
   UserManagement: undefined;
   AddUser: undefined;
   EditUser: { userId: string };
   EditAccount: undefined;
   ChangePassword: undefined;
+
+  RecipientManagement: undefined;
+  AddRecipient: undefined;
+  EditRecipient: { recipientId: string };
+  RecipientQr: { recipientId: string };
 };
 
 export type DocumentsStackParamList = {
