@@ -109,4 +109,8 @@ export const styles = StyleSheet.create({
     fontSize: 13,
     color: "#6B7280",
   },
+
+  passwordButtonPressed: {
+  opacity: 0.7,
+},
 });

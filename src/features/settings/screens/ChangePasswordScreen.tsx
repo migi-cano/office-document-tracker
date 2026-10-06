@@ -1,16 +1,13 @@
 import {
   Alert,
-  Pressable,
   View,
 } from "react-native";
-
+import { useState } from "react";
+import { StatusBar } from "expo-status-bar";
 import {
   useNavigation,
 } from "@react-navigation/native";
-
-import { useState } from "react";
-
-import { Ionicons } from "@expo/vector-icons";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 import {
   SafeScreen,
@@ -18,18 +15,26 @@ import {
 } from "../../../components/layout";
 
 import {
+  AppButton,
   AppInput,
   AppText,
 } from "../../../components/common";
 
-import { SettingsHeader } from "../components";
-
 import { supabase } from "../../../lib/supabase";
+
+import { RootStackParamList } from "../../../navigation/navigation.types";
 
 import { styles } from "./ChangePasswordScreen.styles";
 
+type NavigationProp =
+  NativeStackNavigationProp<
+    RootStackParamList,
+    "ChangePassword"
+  >;
+
 export default function ChangePasswordScreen() {
-  const navigation = useNavigation();
+  const navigation =
+    useNavigation<NavigationProp>();
 
   const [currentPassword, setCurrentPassword] =
     useState("");
@@ -46,7 +51,7 @@ export default function ChangePasswordScreen() {
   async function handleChangePassword() {
     if (!currentPassword) {
       Alert.alert(
-        "Required",
+        "Missing Password",
         "Please enter your current password."
       );
       return;
@@ -54,24 +59,32 @@ export default function ChangePasswordScreen() {
 
     if (!newPassword) {
       Alert.alert(
-        "Required",
+        "Missing Password",
         "Please enter your new password."
       );
       return;
     }
 
-    if (newPassword.length < 6) {
-      Alert.alert(
-        "Invalid Password",
-        "Your new password must be at least 6 characters."
-      );
-      return;
-    }
+    if (newPassword.length < 8) {
+        Alert.alert(
+          "Invalid Password",
+          "Your new password must be at least 8 characters long."
+        );
+        return;
+      }
 
     if (newPassword !== confirmPassword) {
       Alert.alert(
         "Passwords Do Not Match",
         "The new password and confirmation password must match."
+      );
+      return;
+    }
+
+    if (currentPassword === newPassword) {
+      Alert.alert(
+        "Invalid Password",
+        "Your new password must be different from your current password."
       );
       return;
     }
@@ -88,19 +101,22 @@ export default function ChangePasswordScreen() {
 
       if (userError || !user?.email) {
         throw new Error(
-          "Unable to determine the current account."
+          "Unable to retrieve your account information."
         );
       }
 
-      // Verify current password
+      /*
+       * Verify the current password first.
+       */
       const {
-        error: signInError,
-      } = await supabase.auth.signInWithPassword({
-        email: user.email,
-        password: currentPassword,
-      });
+        error: verifyError,
+      } =
+        await supabase.auth.signInWithPassword({
+          email: user.email,
+          password: currentPassword,
+        });
 
-      if (signInError) {
+      if (verifyError) {
         Alert.alert(
           "Incorrect Password",
           "The current password you entered is incorrect."
@@ -108,20 +124,27 @@ export default function ChangePasswordScreen() {
         return;
       }
 
-      // Update password
+      /*
+       * Update the password.
+       */
       const {
         error: updateError,
-      } = await supabase.auth.updateUser({
-        password: newPassword,
-      });
+      } =
+        await supabase.auth.updateUser({
+          password: newPassword,
+        });
 
       if (updateError) {
         throw updateError;
       }
 
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+
       Alert.alert(
         "Password Changed",
-        "Your password has been successfully changed.",
+        "Your password has been changed successfully.",
         [
           {
             text: "OK",
@@ -129,20 +152,17 @@ export default function ChangePasswordScreen() {
           },
         ]
       );
-
-      setCurrentPassword("");
-      setNewPassword("");
-      setConfirmPassword("");
-    } catch (error: any) {
+    } catch (error) {
       console.error(
         "Change password error:",
         error
       );
 
       Alert.alert(
-        "Password Change Failed",
-        error?.message ||
-          "Unable to change your password."
+        "Change Password Failed",
+        error instanceof Error
+          ? error.message
+          : "Unable to change your password."
       );
     } finally {
       setLoading(false);
@@ -151,7 +171,13 @@ export default function ChangePasswordScreen() {
 
   return (
     <SafeScreen backgroundColor="#0D1233">
-      <SettingsHeader title="Change Password" />
+      <StatusBar style="light" />
+
+      <View style={styles.header}>
+        <AppText style={styles.headerTitle}>
+          Change Password
+        </AppText>
+      </View>
 
       <View style={styles.container}>
         <ScrollableScreen
@@ -159,58 +185,74 @@ export default function ChangePasswordScreen() {
         >
           <View style={styles.content}>
 
-            <AppText style={styles.description}>
-              Enter your current password and choose
-              a new password for your account.
-            </AppText>
+            <View style={styles.intro}>
+              <AppText style={styles.sectionTitle}>
+                Update Your Password
+              </AppText>
 
-            <AppInput
-              label="Current Password"
-              value={currentPassword}
-              onChangeText={setCurrentPassword}
-              secureTextEntry
-              editable={!loading}
-              placeholder="Enter current password"
-            />
+              <AppText style={styles.description}>
+                Enter your current password and choose
+                a new password for your account.
+              </AppText>
+            </View>
 
-            <AppInput
-              label="New Password"
-              value={newPassword}
-              onChangeText={setNewPassword}
-              secureTextEntry
-              editable={!loading}
-              placeholder="Enter new password"
-            />
+            <View style={styles.formCard}>
 
-            <AppInput
-              label="Confirm New Password"
-              value={confirmPassword}
-              onChangeText={setConfirmPassword}
-              secureTextEntry
-              editable={!loading}
-              placeholder="Confirm new password"
-            />
-
-            <Pressable
-              style={[
-                styles.button,
-                loading && styles.buttonDisabled,
-              ]}
-              onPress={handleChangePassword}
-              disabled={loading}
-            >
-              <Ionicons
-                name="lock-closed-outline"
-                size={20}
-                color="#FFFFFF"
+              <AppInput
+                label="Current Password"
+                placeholder="Enter current password"
+                secureTextEntry
+                value={currentPassword}
+                onChangeText={setCurrentPassword}
               />
 
-              <AppText style={styles.buttonText}>
-                {loading
-                  ? "Changing Password..."
-                  : "Change Password"}
+              <View style={styles.fieldSpacing}>
+                <AppInput
+                  label="New Password"
+                  placeholder="Enter new password"
+                  secureTextEntry
+                  value={newPassword}
+                  onChangeText={setNewPassword}
+                />
+              </View>
+
+              <View style={styles.fieldSpacing}>
+                <AppInput
+                  label="Confirm New Password"
+                  placeholder="Confirm new password"
+                  secureTextEntry
+                  value={confirmPassword}
+                  onChangeText={setConfirmPassword}
+                />
+              </View>
+
+              <View style={styles.buttonContainer}>
+                <AppButton
+                  title="Change Password"
+                  loading={loading}
+                  onPress={handleChangePassword}
+                />
+              </View>
+
+            </View>
+
+            <View style={styles.requirements}>
+              <AppText style={styles.requirementsTitle}>
+                Password requirements
               </AppText>
-            </Pressable>
+
+              <AppText style={styles.requirement}>
+                • At least 8 characters
+              </AppText>
+
+              <AppText style={styles.requirement}>
+                • Must be different from your current password
+              </AppText>
+
+              <AppText style={styles.requirement}>
+                • Confirmation must match the new password
+              </AppText>
+            </View>
 
           </View>
         </ScrollableScreen>

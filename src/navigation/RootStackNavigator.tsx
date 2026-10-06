@@ -1,11 +1,16 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+
 import MainTabNavigator from "./MainTabNavigator";
 import NotificationsScreen from "../features/notifications/screens/NotificationsScreen";
+
 import { RootStackParamList } from "./navigation.types";
+
 import UserManagementScreen from "../features/users/screens/UserManagementScreen";
 import AddUserScreen from "../features/users/screens/AddUserScreen";
 import EditUserScreen from "../features/users/screens/EditUserScreen";
+
 import EditAccountScreen from "../features/settings/screens/EditAccountScreen";
+import ChangePasswordScreen from "../features/settings/screens/ChangePasswordScreen";
 
 const Stack =
   createNativeStackNavigator<RootStackParamList>();
@@ -45,6 +50,11 @@ export default function RootStackNavigator() {
       <Stack.Screen
         name="EditAccount"
         component={EditAccountScreen}
+      />
+
+      <Stack.Screen
+        name="ChangePassword"
+        component={ChangePasswordScreen}
       />
     </Stack.Navigator>
   );

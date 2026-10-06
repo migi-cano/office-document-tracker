@@ -5,10 +5,12 @@ export type RootStackParamList = {
   Auth: undefined;
   MainTabs: NavigatorScreenParams<MainTabParamList>;
   Notifications: undefined;
+
   UserManagement: undefined;
   AddUser: undefined;
   EditUser: { userId: string };
   EditAccount: undefined;
+  ChangePassword: undefined;
 };
 
 export type DocumentsStackParamList = {

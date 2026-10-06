@@ -115,4 +115,40 @@ export const styles = StyleSheet.create({
   buttonContainer: {
     marginTop: 12,
   },
+  loginError: {
+  marginTop: 2,
+  marginBottom: 8,
+  fontSize: 13,
+  color: "#FCA5A5",
+},
+
+loadingOverlay: {
+  position: "absolute",
+  top: 0,
+  right: 0,
+  bottom: 0,
+  left: 0,
+  alignItems: "center",
+  justifyContent: "center",
+  backgroundColor: "#FFFFFF",
+  zIndex: 100,
+},
+
+loadingLogo: {
+  width: 280,
+  height: 100,
+},
+
+loadingIndicator: {
+  flexDirection: "row",
+  alignItems: "center",
+  marginTop: 18,
+},
+
+loadingText: {
+  marginLeft: 10,
+  fontSize: 14,
+  fontWeight: "500",
+  color: "#07079A",
+},
 });

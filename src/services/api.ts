@@ -6,7 +6,7 @@ const api = axios.create({
   // baseURL: "http://10.0.2.2:3000/api",
 
   // Physical Android phone
-  baseURL: "http://192.168.101.111:3000/api",
+  baseURL: "http://192.168.103.47:3000/api",
 
   // iOS Simulator
   // baseURL: "http://localhost:3000/api",

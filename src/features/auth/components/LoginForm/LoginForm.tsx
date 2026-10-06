@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
+  ActivityIndicator,
   Animated,
   Image,
   Pressable,
@@ -26,10 +27,17 @@ import { styles } from "./LoginForm.styles";
 const logo = require("../../../../../assets/images/onencr.png");
 
 export default function LoginForm() {
-  const [passwordVisible, setPasswordVisible] = useState(false);
-  const { height: screenHeight } = useWindowDimensions();
-  const logoAnimation = useRef(new Animated.Value(0)).current;
-  const formAnimation = useRef(new Animated.Value(0)).current;
+  const [passwordVisible, setPasswordVisible] =
+    useState(false);
+
+  const { height: screenHeight } =
+    useWindowDimensions();
+
+  const logoAnimation =
+    useRef(new Animated.Value(0)).current;
+
+  const formAnimation =
+    useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     Animated.sequence([
@@ -39,6 +47,7 @@ export default function LoginForm() {
         delay: 2000,
         useNativeDriver: true,
       }),
+
       Animated.parallel([
         Animated.timing(formAnimation, {
           toValue: 1,
@@ -63,7 +72,11 @@ export default function LoginForm() {
     },
   });
 
-  const { login, loading } = useLogin();
+  const {
+    login,
+    loading,
+    error,
+  } = useLogin();
 
   async function onSubmit(data: LoginFormData) {
     await login(data);
@@ -71,7 +84,6 @@ export default function LoginForm() {
 
   return (
     <View style={styles.container}>
-
       {/* Logo */}
       <Animated.View
         style={[
@@ -79,10 +91,14 @@ export default function LoginForm() {
           {
             transform: [
               {
-                translateY: logoAnimation.interpolate({
-                  inputRange: [0, 1],
-                  outputRange: [-46, 24 - screenHeight / 2],
-                }),
+                translateY:
+                  logoAnimation.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [
+                      -46,
+                      24 - screenHeight / 2,
+                    ],
+                  }),
               },
             ],
           },
@@ -102,10 +118,11 @@ export default function LoginForm() {
             opacity: formAnimation,
             transform: [
               {
-                translateY: formAnimation.interpolate({
-                  inputRange: [0, 1],
-                  outputRange: [18, 0],
-                }),
+                translateY:
+                  formAnimation.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [18, 0],
+                  }),
               },
             ],
           },
@@ -124,89 +141,131 @@ export default function LoginForm() {
 
         {/* Login Panel */}
         <View style={styles.loginPanel}>
+          {/* Username */}
+          <View style={styles.field}>
+            <AppText style={styles.label}>
+              Email Address
+            </AppText>
 
-        {/* Username */}
-        <View style={styles.field}>
-          <AppText style={styles.label}>
-            Email Address
-          </AppText>
-
-          <View style={styles.inputWrapper}>
-            <Ionicons
-              name="mail-outline"
-              size={20}
-              color="#9CA3AF"
-              style={styles.inputIcon}
-            />
-
-            <AppInput
-              placeholder="name@company.com"
-              value={watch("username")}
-              onChangeText={(text) =>
-                setValue("username", text, {
-                  shouldValidate: true,
-                })
-              }
-              error={errors.username?.message}
-              style={styles.input}
-            />
-          </View>
-        </View>
-
-        {/* Password */}
-        <View style={styles.field}>
-          <AppText style={styles.label}>
-            Password
-          </AppText>
-
-          <View style={styles.inputWrapper}>
-            <Ionicons
-              name="lock-closed-outline"
-              size={20}
-              color="#9CA3AF"
-              style={styles.inputIcon}
-            />
-
-            <AppInput
-              placeholder="••••••••••••"
-              secureTextEntry={!passwordVisible}
-              value={watch("password")}
-              onChangeText={(text) =>
-                setValue("password", text, {
-                  shouldValidate: true,
-                })
-              }
-              error={errors.password?.message}
-              style={[styles.input, styles.passwordInput]}
-            />
-
-            <Pressable
-              accessibilityLabel={passwordVisible ? "Hide password" : "Show password"}
-              accessibilityRole="button"
-              hitSlop={8}
-              onPress={() => setPasswordVisible((visible) => !visible)}
-              style={styles.passwordToggle}
-            >
+            <View style={styles.inputWrapper}>
               <Ionicons
-                name={passwordVisible ? "eye-off-outline" : "eye-outline"}
+                name="mail-outline"
                 size={20}
-                color="#6B7280"
+                color="#9CA3AF"
+                style={styles.inputIcon}
               />
-            </Pressable>
+
+              <AppInput
+                placeholder="name@company.com"
+                value={watch("username")}
+                onChangeText={(text) =>
+                  setValue("username", text, {
+                    shouldValidate: true,
+                  })
+                }
+                error={errors.username?.message}
+                style={styles.input}
+              />
+            </View>
           </View>
-        </View>
 
-        {/* Login Button */}
-        <View style={styles.buttonContainer}>
-          <AppButton
-            title="Login"
-            loading={loading}
-            onPress={handleSubmit(onSubmit)}
-          />
-        </View>
+          {/* Password */}
+          <View style={styles.field}>
+            <AppText style={styles.label}>
+              Password
+            </AppText>
 
+            <View style={styles.inputWrapper}>
+              <Ionicons
+                name="lock-closed-outline"
+                size={20}
+                color="#9CA3AF"
+                style={styles.inputIcon}
+              />
+
+              <AppInput
+                placeholder="••••••••••••"
+                secureTextEntry={!passwordVisible}
+                value={watch("password")}
+                onChangeText={(text) =>
+                  setValue("password", text, {
+                    shouldValidate: true,
+                  })
+                }
+                error={errors.password?.message}
+                style={[
+                  styles.input,
+                  styles.passwordInput,
+                ]}
+              />
+
+              <Pressable
+                accessibilityLabel={
+                  passwordVisible
+                    ? "Hide password"
+                    : "Show password"
+                }
+                accessibilityRole="button"
+                hitSlop={8}
+                onPress={() =>
+                  setPasswordVisible(
+                    (visible) => !visible
+                  )
+                }
+                style={styles.passwordToggle}
+              >
+                <Ionicons
+                  name={
+                    passwordVisible
+                      ? "eye-off-outline"
+                      : "eye-outline"
+                  }
+                  size={20}
+                  color="#6B7280"
+                />
+              </Pressable>
+            </View>
+
+            {/* Login Error */}
+            {error ? (
+              <AppText style={styles.loginError}>
+                {error}
+              </AppText>
+            ) : null}
+          </View>
+
+          {/* Login Button */}
+          <View style={styles.buttonContainer}>
+            <AppButton
+              title="Login"
+              loading={loading}
+              onPress={handleSubmit(onSubmit)}
+            />
+          </View>
         </View>
       </Animated.View>
+
+      {/* Login Loading Overlay */}
+      {loading && (
+        <View style={styles.loadingOverlay}>
+          <Image
+            source={logo}
+            style={styles.loadingLogo}
+            resizeMode="contain"
+          />
+
+          <View style={styles.loadingIndicator}>
+            <ActivityIndicator
+              size="small"
+              color="#07079A"
+            />
+
+            <AppText style={styles.loadingText}>
+              Logging in...
+            </AppText>
+          </View>
+        </View>
+      )}
     </View>
   );
 }

@@ -1,12 +1,13 @@
 import {
-  Alert,
   Pressable,
   View,
 } from "react-native";
 
+import { useNavigation } from "@react-navigation/native";
+
 import {
-  useNavigation,
-} from "@react-navigation/native";
+  NativeStackNavigationProp,
+} from "@react-navigation/native-stack";
 
 import { Ionicons } from "@expo/vector-icons";
 
@@ -22,12 +23,24 @@ import {
 
 import { useAuth } from "../../../providers/AuthProvider";
 
+import {
+  RootStackParamList,
+} from "../../../navigation/navigation.types";
+
 import { SettingsHeader } from "../components";
 
 import { styles } from "./EditAccountScreen.styles";
 
+type NavigationProp =
+  NativeStackNavigationProp<
+    RootStackParamList,
+    "EditAccount"
+  >;
+
 export default function EditAccountScreen() {
-  const navigation = useNavigation();
+  const navigation =
+    useNavigation<NavigationProp>();
+
   const { user } = useAuth();
 
   if (!user) {
@@ -35,7 +48,7 @@ export default function EditAccountScreen() {
   }
 
   function handleChangePassword() {
-    navigation.navigate("ChangePassword" as never);
+    navigation.navigate("ChangePassword");
   }
 
   return (
@@ -47,7 +60,7 @@ export default function EditAccountScreen() {
           showsVerticalScrollIndicator={false}
         >
           <View style={styles.content}>
-
+            {/* Account Header */}
             <View style={styles.accountHeader}>
               <View style={styles.avatar}>
                 <AppText style={styles.avatarText}>
@@ -71,6 +84,7 @@ export default function EditAccountScreen() {
               </View>
             </View>
 
+            {/* Account Information */}
             <View style={styles.section}>
               <AppText style={styles.sectionTitle}>
                 Account Information
@@ -95,13 +109,18 @@ export default function EditAccountScreen() {
               />
             </View>
 
+            {/* Security */}
             <View style={styles.section}>
               <AppText style={styles.sectionTitle}>
                 Security
               </AppText>
 
               <Pressable
-                style={styles.passwordButton}
+                style={({ pressed }) => [
+                  styles.passwordButton,
+                  pressed &&
+                    styles.passwordButtonPressed,
+                ]}
                 onPress={handleChangePassword}
               >
                 <View style={styles.passwordIcon}>
@@ -113,11 +132,15 @@ export default function EditAccountScreen() {
                 </View>
 
                 <View style={styles.passwordInfo}>
-                  <AppText style={styles.passwordTitle}>
+                  <AppText
+                    style={styles.passwordTitle}
+                  >
                     Change Password
                   </AppText>
 
-                  <AppText style={styles.passwordSubtitle}>
+                  <AppText
+                    style={styles.passwordSubtitle}
+                  >
                     Update your account password
                   </AppText>
                 </View>
@@ -129,7 +152,6 @@ export default function EditAccountScreen() {
                 />
               </Pressable>
             </View>
-
           </View>
         </ScrollableScreen>
       </View>
