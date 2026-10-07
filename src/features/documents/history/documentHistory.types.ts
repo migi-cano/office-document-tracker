@@ -15,5 +15,7 @@ export interface DocumentHistory {
 
   performedBy?: string;
 
+  recipientId?: string;
+
   createdAt: string;
 }

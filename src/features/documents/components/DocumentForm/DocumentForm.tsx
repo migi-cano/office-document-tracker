@@ -20,7 +20,7 @@ export default function DocumentForm({
   const {
   control,
   handleSubmit,
-} = useReceiveDocument(initialValues);
+} = useReceiveDocument(initialValues, direction);
   return (
     <View style={styles.container}>
       <AppInput

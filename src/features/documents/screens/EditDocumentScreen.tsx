@@ -83,7 +83,7 @@ export default function EditDocumentScreen() {
       remarks: data.remarks,
     });
 
-    navigation.navigate("DocumentsList", {});
+    navigation.navigate("DocumentsList");
   } catch (error) {
     Alert.alert(
       "Update Failed",

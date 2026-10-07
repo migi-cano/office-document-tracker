@@ -30,6 +30,8 @@ export interface Document {
 
   destination?: string;
 
+  recipientId?: string;
+
   departmentFrom?: string;
 
   processedBy?: string;
@@ -49,6 +51,6 @@ export interface Document {
   createdAt: string;
 
   updatedAt: string;
-  
+
   imagePath?: string;
 }

@@ -8,6 +8,7 @@ import { DocumentPersonnelProps } from "./DocumentPersonnel.types";
 
 export default function DocumentPersonnel({
   document,
+  recipient,
 }: DocumentPersonnelProps) {
   return (
     <View style={styles.container}>
@@ -17,12 +18,17 @@ export default function DocumentPersonnel({
 
       <DetailRow
         label="Received By"
-        value={document.receivedBy ?? "-"}
+        value={recipient?.name ?? document.receivedBy ?? "-"}
       />
 
       <DetailRow
         label="Processed By"
         value={document.processedBy ?? "-"}
+      />
+
+      <DetailRow
+        label="Department"
+        value={recipient?.department ?? "-"}
       />
     </View>
   );

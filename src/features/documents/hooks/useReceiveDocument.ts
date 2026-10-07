@@ -2,18 +2,23 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import {
+  incomingDocumentSchema,
   receiveDocumentSchema,
   ReceiveDocumentFormData,
 } from "../validation/receiveDocument.schema";
 
 export function useReceiveDocument(
-  
-  initialValues?: Partial<ReceiveDocumentFormData>
+  initialValues?: Partial<ReceiveDocumentFormData>,
+  direction?: "IN" | "OUT"
 ) {
   console.log("=== USE RECEIVE DOCUMENT ===");
 console.log(initialValues);
   return useForm<ReceiveDocumentFormData>({
-    resolver: zodResolver(receiveDocumentSchema),
+    resolver: zodResolver(
+      direction === "IN"
+        ? incomingDocumentSchema
+        : receiveDocumentSchema
+    ),
 
     defaultValues: {
         title: initialValues?.title ?? "",

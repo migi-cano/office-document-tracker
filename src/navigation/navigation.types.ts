@@ -33,10 +33,11 @@ export type DocumentsStackParamList = {
   };
 
   OutgoingDocument: {
-    analysis: AiDocumentAnalysis;
-    ocrText: string;
-    imageUri: string;
-  };
+  imageUri: string;
+  ocrText: string;
+  analysis: AiDocumentAnalysis;
+  recipientId?: string;
+};
 
   DocumentDetails: {
     documentId: string;
@@ -49,6 +50,12 @@ export type DocumentsStackParamList = {
   DocumentImage: {
     imageUrl: string;
   };
+
+  RecipientQrScanner: {
+  documentId: string;
+};
+
+
 };
 
 export type MainTabParamList = {

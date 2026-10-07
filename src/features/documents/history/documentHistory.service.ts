@@ -1,4 +1,5 @@
 import { supabase } from "../../../lib/supabase";
+
 import { DocumentHistory } from "./documentHistory.types";
 
 const TABLE = "document_history";
@@ -12,18 +13,25 @@ const toHistory = (data: any): DocumentHistory => ({
   department: data.department,
   remarks: data.remarks,
   performedBy: data.performed_by,
+  recipientId: data.recipient_id,
   createdAt: data.created_at,
 });
 
 export const documentHistoryService = {
-  async getHistory(documentId: string): Promise<DocumentHistory[]> {
+  async getHistory(
+    documentId: string
+  ): Promise<DocumentHistory[]> {
     const { data, error } = await supabase
       .from(TABLE)
       .select("*")
       .eq("document_id", documentId)
-      .order("created_at", { ascending: false });
+      .order("created_at", {
+        ascending: false,
+      });
 
-    if (error) throw error;
+    if (error) {
+      throw error;
+    }
 
     return (data ?? []).map(toHistory);
   },
@@ -41,11 +49,14 @@ export const documentHistoryService = {
         department: history.department,
         remarks: history.remarks,
         performed_by: history.performedBy,
+        recipient_id: history.recipientId,
       })
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) {
+      throw error;
+    }
 
     return toHistory(data);
   },

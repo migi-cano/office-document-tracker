@@ -6,6 +6,8 @@ export function toDocument(row: any): Document {
 
     trackingNumber: row.tracking_number,
 
+    direction: row.direction,
+
     documentType: row.document_type,
 
     title: row.title,

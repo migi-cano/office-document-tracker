@@ -1,22 +1,23 @@
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
 import DashboardScreen from "../features/dashboard/screens/DashboardScreen";
 import DocumentsScreen from "../features/documents/screens/DocumentsScreen";
+import { MainTabParamList } from "./navigation.types";
 
-const Stack = createNativeStackNavigator();
+const Tab = createBottomTabNavigator<MainTabParamList>();
 
 export default function MainNavigator() {
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen
+    <Tab.Navigator screenOptions={{ headerShown: false }}>
+      <Tab.Screen
         name="Dashboard"
         component={DashboardScreen}
       />
 
-      <Stack.Screen
+      <Tab.Screen
         name="Documents"
         component={DocumentsScreen}
       />
-    </Stack.Navigator>
+    </Tab.Navigator>
   );
 }

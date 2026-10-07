@@ -8,73 +8,43 @@ import notificationService from "../../notifications/services/notification.servi
 
 const toDocument = (row: any): Document => ({
   id: row.id,
-
   trackingNumber: row.tracking_number,
-
   direction: row.direction,
-
   documentType: row.document_type,
-
   title: row.title,
-
   subject: row.subject,
-
   imagePath: row.image_path,
-
   destination: row.destination,
-
   departmentFrom: row.department_from,
-
   processedBy: row.processed_by,
-
   receivedBy: row.received_by,
-
+  recipientId: row.recipient_id,
   status: row.status,
-
   remarks: row.remarks,
-
   documentDate: row.document_date,
-
   ocrText: row.ocr_text,
-
   attachmentUrl: row.attachment_url,
-
   createdAt: row.created_at,
-
   updatedAt: row.updated_at,
 });
 
  const toDatabase = (document: Partial<Document>) => ({
   tracking_number: document.trackingNumber,
-
   direction: document.direction,
-
   document_type: document.documentType,
-
   title: document.title,
-
   subject: document.subject,
-  
   image_path: document.imagePath,
-
   destination: document.destination,
-
   department_from: document.departmentFrom,
-
   processed_by: document.processedBy,
-
   received_by: document.receivedBy,
-
+  recipient_id: document.recipientId,
   status: document.status,
-
   remarks: document.remarks,
-
   document_date: document.documentDate,
-
   ocr_text: document.ocrText,
-
   attachment_url: document.attachmentUrl,
-
 });
 
 async function getCurrentUserName(): Promise<string> {
@@ -213,8 +183,8 @@ const { data, error } = await query;
  
   if (updated) {
   await notificationService.createNotification({
-    title: `Document ${status}`,
-    message: `${updated.title} is now ${status}.`,
+    title: `Document ${updated.status}`,
+    message: `${updated.title} is now ${updated.status}.`,
     documentId: updated.id,
   });
 }
@@ -273,7 +243,8 @@ const { data, error } = await query;
 
   async updateStatus(
   documentId: string,
-  status: DocumentStatus
+  status: DocumentStatus,
+  recipientId?: string
 ) {
   const titleMap: Record<DocumentStatus, string> = {
     PENDING: "Document Pending",
@@ -282,12 +253,21 @@ const { data, error } = await query;
     COMPLETED: "Document Completed",
   };
 
+  
+
   const currentUser = await getCurrentUserName();
 
   const updateData: Record<string, any> = {
-    status,
-    updated_at: new Date().toISOString(),
-  };
+  status,
+  updated_at: new Date().toISOString(),
+};
+
+if (
+  status === DocumentStatus.RELEASED &&
+  recipientId
+) {
+  updateData.recipient_id = recipientId;
+}
 
   if (status === "RELEASED") {
     updateData.processed_by = currentUser;

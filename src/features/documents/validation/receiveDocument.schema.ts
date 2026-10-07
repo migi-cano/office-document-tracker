@@ -24,5 +24,12 @@ export const receiveDocumentSchema = z.object({
   documentType: z.string().min(1, "Document type is required"),
 });
 
+export const incomingDocumentSchema = receiveDocumentSchema.extend({
+  departmentFrom: z
+    .string()
+    .trim()
+    .min(1, "Department is required."),
+});
+
 export type ReceiveDocumentFormData =
     z.infer<typeof receiveDocumentSchema>;

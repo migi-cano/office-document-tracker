@@ -31,9 +31,12 @@ export default function IncomingFields({
       <Controller
         control={control}
         name="departmentFrom"
+        rules={{
+          required: "Department is required.",
+        }}
         render={({ field, fieldState }) => (
           <AppDropdown
-            label="Department From"
+            label="Department"
             placeholder="Select department"
             data={departmentOptions}
             value={field.value ?? ""}
