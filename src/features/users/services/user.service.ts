@@ -59,10 +59,9 @@ class UserService {
   ): Promise<User> {
     console.log("Looking for auth_id:", authId);
 
-    const { data, error } = await supabase
-      .from("users")
-      .select("*")
-      .eq("auth_id", authId);
+    const { data, error } = await supabase.rpc(
+  "get_my_user_profile"
+);
 
     console.log("Supabase Data:", data);
     console.log("Supabase Error:", error);

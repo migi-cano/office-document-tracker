@@ -16,7 +16,7 @@ export default function DocumentForm({
   onSubmit,
 }: DocumentFormProps) {
   
-  
+  console.log("DOCUMENT FORM INITIAL VALUES:", initialValues);
   const {
   control,
   handleSubmit,

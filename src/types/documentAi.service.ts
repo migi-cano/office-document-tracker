@@ -1,12 +1,12 @@
 import { AiDocumentAnalysis } from "./ai-document-analysis.types";
+import API_URL from "../config/api";
 
 class DocumentAIService {
-    
   async extractDocument(
-  ocrText: string
-): Promise<AiDocumentAnalysis> {
+    ocrText: string
+  ): Promise<AiDocumentAnalysis> {
     const response = await fetch(
-      "http://192.168.103.47:3000/api/ai/extract",
+      `${API_URL}/api/ai/extract`,
       {
         method: "POST",
         headers: {
@@ -17,16 +17,15 @@ class DocumentAIService {
         }),
       }
     );
-    
 
     if (!response.ok) {
-  const error = await response.text();
+      const error = await response.text();
 
-  console.log("===== AI SERVER ERROR =====");
-  console.log(error);
+      console.log("===== AI SERVER ERROR =====");
+      console.log(error);
 
-  throw new Error(error);
-}
+      throw new Error(error);
+    }
 
     return (await response.json()) as AiDocumentAnalysis;
   }

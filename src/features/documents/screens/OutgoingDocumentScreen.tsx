@@ -50,10 +50,11 @@ export default function OutgoingDocumentScreen() {
   const { analysis } = route.params;
 
   const {
-    title: aiTitle,
-    subject: aiSubject,
-    documentType: aiDocumentType,
-  } = analysis;
+  title: aiTitle,
+  subject: aiSubject,
+  documentType: aiDocumentType,
+  remarks: aiRemarks,
+} = analysis;
 
   const ocrText =
     route.params?.ocrText ?? "";
@@ -194,6 +195,9 @@ export default function OutgoingDocumentScreen() {
 
                   documentType:
                     aiDocumentType,
+
+                  remarks:
+                    aiRemarks || "",
                 }}
                 submitButtonTitle="Save Outgoing Document"
                 onSubmit={handleCreate}

@@ -2,12 +2,13 @@ export interface ExtractedDocument {
   title: string;
   subject: string;
   documentType: string;
+  remarks: string;
 }
 
 export const DOCUMENT_TYPES = [
-  { label: "Memorandum", value: "Memorandum" },
+  { label: "Regional Memorandum", value: "Regional Memorandum" },
   { label: "Letter", value: "Letter" },
-  { label: "Office Order", value: "Office Order" },
+  { label: "Office Memorandum", value: "Office Memorandum" },
   { label: "Purchase Order", value: "Purchase Order" },
   { label: "Invoice", value: "Invoice" },
   { label: "Delivery Receipt", value: "Delivery Receipt" },

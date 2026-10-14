@@ -87,78 +87,97 @@ export default function ScannerScreen() {
   }
 
   const handleContinue = async () => {
-    if (!photoUri) {
-      Alert.alert(
-        "No image",
-        "Please capture a document first."
-      );
-      return;
-    }
+  if (!photoUri) {
+    Alert.alert(
+      "No image",
+      "Please capture a document first."
+    );
+    return;
+  }
 
-    setLoading(true);
-    setLoadingMessage("Extracting text...");
+  setLoading(true);
+  setLoadingMessage("Extracting text...");
+
+  try {
+    const ocr =
+      await ocrService.extractDocument(photoUri);
+
+    console.log("===== OCR TEXT =====");
+    console.log(ocr.fullText);
+
+    setLoadingMessage("Analyzing document...");
+
+    let analysis: AiDocumentAnalysis;
 
     try {
-      const ocr =
-        await ocrService.extractDocument(photoUri);
-
-      console.log("OCR:");
-      console.log(ocr.fullText);
-
-      setLoadingMessage("Analyzing document...");
-
-      let analysis: AiDocumentAnalysis;
-
-      setLoadingMessage("Preparing preview...");
-
-      try {
-        analysis =
-          await documentAIService.extractDocument(
-            ocr.fullText
-          );
-      } catch (error) {
-        console.warn(
-          "Gemini extraction failed:",
-          error
+      analysis =
+        await documentAIService.extractDocument(
+          ocr.fullText
         );
 
-        Alert.alert(
-          "AI Unavailable",
-          "The document was scanned successfully, but AI extraction is currently unavailable. You can continue and fill in the information manually."
-        );
+      console.log("===== AI ANALYSIS FROM API =====");
+      console.log(
+        JSON.stringify(analysis, null, 2)
+      );
 
-        analysis = {
-          documentType: "",
-          title: "",
-          subject: "",
-        };
-      }
+      console.log(
+        "===== AI REMARKS ====="
+      );
+      console.log(analysis.remarks);
 
-      setLoading(false);
-
-      navigation.navigate("Documents", {
-        screen: "DocumentPreview",
-        params: {
-          imageUri: photoUri,
-          ocrText: ocr.fullText,
-          analysis,
-        },
-      });
-
-      retakePhoto();
     } catch (error) {
-      setLoading(false);
-
-      console.error(error);
+      console.warn(
+        "Gemini extraction failed:",
+        error
+      );
 
       Alert.alert(
-        "Failed",
-        error instanceof Error
-          ? error.message
-          : "Unknown error"
+        "AI Unavailable",
+        "The document was scanned successfully, but AI extraction is currently unavailable. You can continue and fill in the information manually."
       );
+
+      analysis = {
+        documentType: "",
+        title: "",
+        subject: "",
+        remarks: "",
+      };
     }
-  };
+
+    console.log(
+      "===== FINAL ANALYSIS BEFORE NAVIGATION ====="
+    );
+    console.log(
+      JSON.stringify(analysis, null, 2)
+    );
+
+    setLoadingMessage("Preparing preview...");
+
+    setLoading(false);
+
+    navigation.navigate("Documents", {
+      screen: "DocumentPreview",
+      params: {
+        imageUri: photoUri,
+        ocrText: ocr.fullText,
+        analysis,
+      },
+    });
+
+    retakePhoto();
+  } catch (error) {
+    setLoading(false);
+
+    console.error(error);
+
+    Alert.alert(
+      "Failed",
+      error instanceof Error
+        ? error.message
+        : "Unknown error"
+    );
+  }
+};
 
   return (
     <SafeScreen backgroundColor="#0D1233">

@@ -55,10 +55,11 @@ export default function ReceiveDocumentScreen() {
     useDepartments();
 
   const {
-    title: aiTitle,
-    subject: aiSubject,
-    documentType: aiDocumentType,
-  } = analysis;
+  title: aiTitle,
+  subject: aiSubject,
+  documentType: aiDocumentType,
+  remarks: aiRemarks,
+} = analysis;
 
   const ocrText =
     route.params?.ocrText ?? "";
@@ -189,17 +190,20 @@ export default function ReceiveDocumentScreen() {
               <DocumentForm
                 direction="IN"
                 initialValues={{
-                  title:
-                    aiTitle ||
-                    parsed.title,
+                    title:
+                      aiTitle ||
+                      parsed.title,
 
-                  subject:
-                    aiSubject ||
-                    parsed.subject,
+                    subject:
+                      aiSubject ||
+                      parsed.subject,
 
-                  documentType:
-                    aiDocumentType,
-                }}
+                    documentType:
+                      aiDocumentType,
+
+                    remarks:
+                      aiRemarks || "",
+                  }}
                 submitButtonTitle="Save Incoming Document"
                 onSubmit={handleCreate}
               />
