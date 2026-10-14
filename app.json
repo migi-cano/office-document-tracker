@@ -22,7 +22,7 @@
   "predictiveBackGestureEnabled": false
 },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/images/onencr.png"
     },
     "plugins": [
       "expo-secure-store",
