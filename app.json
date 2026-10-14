@@ -1,23 +1,26 @@
 {
   "expo": {
-    "name": "office-document-tracker",
-    "slug": "office-document-tracker",
+    "name": "ONENCR Document Tracker",
+    "slug": "ONENCR Document Tracker",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/images/onencr.png",
     "userInterfaceStyle": "light",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.migimigs.officedocumenttracker",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
-      "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/android-icon-foreground.png",
-        "backgroundImage": "./assets/android-icon-background.png",
-        "monochromeImage": "./assets/android-icon-monochrome.png"
-      },
-      "predictiveBackGestureEnabled": false
-    },
+  "adaptiveIcon": {
+    "foregroundImage": "./assets/images/onencr.png",
+    "backgroundColor": "#FFFFFF"
+  },
+  "package": "com.migimigs.officedocumenttracker",
+  "predictiveBackGestureEnabled": false
+},
     "web": {
       "favicon": "./assets/favicon.png"
     },
@@ -25,6 +28,11 @@
       "expo-secure-store",
       "expo-font",
       "expo-status-bar"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "4563d7c6-c483-481f-ae37-aa1b5f4e26ba"
+      }
+    }
   }
 }
