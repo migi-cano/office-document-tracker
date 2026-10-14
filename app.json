@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "ONENCR Document Tracker",
-    "slug": "ONENCR Document Tracker",
+   "slug": "office-document-tracker",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/onencr.png",
